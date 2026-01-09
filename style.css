@@ -1,0 +1,43 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#bgimg {
+  position: absolute;
+    top: 50%;
+  left: 50%;
+    transform: translate(-50%, -50%);
+  background-image: url('assets/bricks.png');
+  image-rendering: pixelated;
+  z-index: 1;
+  background-repeat: repeat;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#canvas1 {
+  image-rendering: pixelated;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+  background-color: black;
+  z-index: 2;
+  background-image: url('assets/TILEMAPBUTIMG.png');
+  background-repeat: no-repeat;
+}
+
+#titletop {
+  image-rendering: pixelated;
+  position: absolute;
+  z-index: 3;
+  background-image: url('assets/title.png');
+}
+
+#tilemap {
+display: none
+}
