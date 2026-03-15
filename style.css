@@ -1,43 +1,45 @@
-*{
-  margin: 0;
+* {
+  margin: 0px;
   padding: 0;
   box-sizing: border-box;
 }
 
-#bgimg {
+#brick_bg {
   position: absolute;
-    top: 50%;
-  left: 50%;
-    transform: translate(-50%, -50%);
-  background-image: url('assets/bricks.png');
   image-rendering: pixelated;
-  z-index: 1;
-  background-repeat: repeat;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-#canvas1 {
-  image-rendering: pixelated;
-  position: absolute;
+  transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   max-width: 100%;
   max-height: 100%;
-  background-color: black;
+  background-image: url('assets/bricks.png');
+  z-index: 1;
+}
+
+#gamespace {
+  position: absolute;
+  image-rendering: pixelated;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  max-width: 100;
+  background-image: url('assets/background.png');
   z-index: 2;
-  background-image: url('assets/TILEMAPBUTIMG.png');
-  background-repeat: no-repeat;
+  background-repeat: repeat;
 }
 
 #titletop {
   image-rendering: pixelated;
   position: absolute;
+  transform: translate(-50%, -500%);
+  top: 50%;
+  left: 50%;
+  max-width: 100;
   z-index: 3;
-  background-image: url('assets/title.png');
+  width: 480px;
+  background-repeat: no-repeat;
 }
 
 #tilemap {
-display: none
+  display: none
 }
