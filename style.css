@@ -22,22 +22,18 @@
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
-  max-width: 100;
   background-image: url('assets/background.png');
   z-index: 2;
   background-repeat: repeat;
 }
 
 #titletop {
-  image-rendering: pixelated;
   position: absolute;
   transform: translate(-50%, -500%);
   top: 50%;
   left: 50%;
-  max-width: 100;
   z-index: 3;
   width: 480px;
-  background-repeat: no-repeat;
 }
 
 #tilemap {
