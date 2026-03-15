@@ -84,12 +84,11 @@ window.addEventListener('load', function () {
 		// NEXT FRAME
 
 		requestAnimationFrame(gameloop);
+
+		// MUSIC LOOP
+		
 		MusicChilderness.play();
 	};
 
 	playerImage.onload = gameloop
 })
-
-
-
-// using css is not working well for the backgrounds so maybe switch to making them in js?????
