@@ -29,6 +29,7 @@
 
 #titletop {
   position: absolute;
+  image-rendering: pixelated;
   transform: translate(-50%, -500%);
   top: 50%;
   left: 50%;
@@ -38,4 +39,9 @@
 
 #tilemap {
   display: none
+}
+
+#issues {
+  z-index: 4;
+  font-size: xx-large;
 }
