@@ -15,20 +15,20 @@ window.addEventListener('load', function () {
 
 	const chickenImage = new Image();
 	chickenImage.src = 'assets/chicken.png';
-	const Chicken = { x: 350, y: 350, width: 64, height: 64, };
+	const Chicken = { x: 350, y: 636, width: 64, height: 64, };
 
 	//CANVAS AND BACKGROUND DIMENSIONS
 
 	gamespace.width = 1300
 	gamespace.height = 700
-	brick_bg.width = 1800
-	brick_bg.height = 1200
+	brick_bg.width = 1432
+	brick_bg.height = 768
 
 	//PLAYER OBJECT
 
 	var playerImage = new Image();
 	playerImage.src = 'assets/goat.png';
-	var Player = { x: 200, y: 150, width: 64, height: 64, speed: 3, gravity: 3,};
+	var Player = { x: 350, y: 150, width: 64, height: 64, speed: 3, gravity: 0.3, velocityY: 0, };
 
 	// KEY CONTROL EVENT LISTENERS
 
@@ -41,34 +41,53 @@ window.addEventListener('load', function () {
 	var SoundCollide = new Audio('assets/bingo.wav');
 	SoundCollide.loop = false;
 	var MusicChilderness = new Audio('assets/childerness.wav');
-	MusicChilderness.loop = true;
+	MusicChilderness.loop = false;
 
 	// COLLISION FUNCTION
 
 	function collisionDetecting(Player, Chicken) {
-		if (Player.x + Player.width >= Chicken.x && Player.x <= Chicken.x + Chicken.width && Player.y + Player.height >= Chicken.y && Player.y <= Chicken.y + Chicken.height) { console.log("collision yaaaay"); SoundCollide.play(); }
+		if (Player.x >= Chicken.x && Player.x <= Chicken.x + 48 && Player.y -2 > Chicken.y -2){ console.log("Player colliding with an object to the left"); SoundCollide.play(); Player.x = Chicken.x + 48};
+		if (Player.x >= Chicken.x - 48 && Player.x <= Chicken.x && Player.y -2 > Chicken.y -2){ console.log("Player colliding with an object to the right"); SoundCollide.play(); Player.x = Chicken.x - 48;};
+		if (Player.y >= Chicken.y - 48 && Player.y <= Chicken.y + 32 && Player.x <= Chicken.x + 32 && Player.x >= Chicken.x - 32){ console.log("Player colliding with an object below"), SoundCollide.play(), Player.y = Chicken.y - 48, Player.velocityY = 0};
 	};
 
-	// BOUNDING FUNCTION FOR CEILING, WALLS AND FLOOR
+	// BOUNDING, ONGROUND AND JUMP FUNCTIONS
+
+	const groundHeight = 636;
+	const ceilingHeight = -5;
+
+	function onGround() {
+		return Player.y >= groundHeight;
+	};
+
+	function jump() {
+		if (keys[' '] && onGround()) { Player.velocityY = -12;};
+	};
 
 	function boundingBox(Player) {
-		if (Player.y < 3) { Player.y = 3 }
-		else if (Player.y > 893) { Player.y = 893 }
+		if (Player.y < ceilingHeight) { Player.y = ceilingHeight, Player.velocityY = 0 }
+		else if (Player.y > groundHeight) { Player.y = groundHeight, Player.velocityY = 0 }
 		else if (Player.x < -5) { Player.x = -5 }
-		else if (Player.x > 1385) { Player.x = 1385 }
+		else if (Player.x > 1250) { Player.x = 1250 }
 	};
 
+	// MUSIC
+
+	MusicChilderness.play();
+
 	// 🟨GAMELOOP🟨GAMELOOP🟨GAMELOOP🟨GAMELOOP🟨GAMELOOP🟨GAMELOOP🟨GAMELOOP🟨
+
 	function gameloop() {
 		context.clearRect(0, 0, gamespace.width, gamespace.height); context.imageSmoothingEnabled = false;
 
 		// KEY CHECK AND BINDINGS
 
-		const speed = keys['c'] ? Player.speed + 1.5 : Player.speed;
-		if (keys['w']) Player.y -= speed;
-		if (keys['s']) Player.y += speed;
+		jump();
+		const speed = keys['c'] ? Player.speed + 1.75 : Player.speed;
 		if (keys['a']) Player.x -= speed;
 		if (keys['d']) Player.x += speed;
+
+		Player.velocityY += Player.gravity; Player.y += Player.velocityY
 
 		// DRAW OBJECTS (PLAYER AND ROCK)
 
@@ -84,10 +103,6 @@ window.addEventListener('load', function () {
 		// NEXT FRAME
 
 		requestAnimationFrame(gameloop);
-
-		// MUSIC LOOP
-		
-		MusicChilderness.play();
 	};
 
 	playerImage.onload = gameloop

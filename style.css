@@ -10,8 +10,6 @@
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
-  max-width: 100%;
-  max-height: 100%;
   background-image: url('assets/bricks.png');
   z-index: 1;
 }
