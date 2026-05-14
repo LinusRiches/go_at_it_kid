@@ -43,3 +43,32 @@
   z-index: 4;
   font-size: xx-large;
 }
+
+#musicbtn {
+  z-index: 4;
+  position: absolute;
+  image-rendering: pixelated;
+  transform: translate(-50%, -500%);
+  top: 16%;
+  left: 94%;
+  z-index: 3;
+}
+
+#soundbtn {
+  z-index: 4;
+  position: absolute;
+  image-rendering: pixelated;
+  transform: translate(-50%, -500%);
+  top: 16%;
+  left: 92%;
+  z-index: 3;
+}
+
+#teststats {
+  z-index: 4;
+  position: absolute;
+  transform: translate(-50%, -500%);
+  top: 30%;
+  left: 20%;
+  z-index: 3;
+}

@@ -28,7 +28,7 @@ window.addEventListener('load', function () {
 
 	var playerImage = new Image();
 	playerImage.src = 'assets/goat.png';
-	var Player = { x: 350, y: 150, width: 64, height: 64, speed: 3, gravity: 0.3, velocityY: 0, };
+	var Player = { x: 350, y: 150, width: 64, height: 64, speed: 3, gravity: 0.4, velocityY: 0, };
 
 	// KEY CONTROL EVENT LISTENERS
 
@@ -36,12 +36,25 @@ window.addEventListener('load', function () {
 	window.addEventListener('keydown', function (e) { e.preventDefault(); keys[e.key] = true; });
 	window.addEventListener('keyup', function (e) { e.preventDefault(); keys[e.key] = false; });
 
-	// MUSIC & SOUND FUNCTION
+	// MUSIC & SOUND FUNCTIONS
 
 	var SoundCollide = new Audio('assets/bingo.wav');
 	SoundCollide.loop = false;
 	var MusicChilderness = new Audio('assets/childerness.wav');
 	MusicChilderness.loop = false;
+	MusicChilderness.autoplay = true;
+
+	const musicToggle = document.getElementById('musicbtn');
+	const soundToggle = document.getElementById('soundbtn');
+
+	musicToggle.addEventListener("click", () => {MusicChilderness.muted = !MusicChilderness.muted});
+
+	soundToggle.addEventListener("click", () => {SoundCollide.muted = !SoundCollide.muted});
+
+	// COORDINATE TRACKER (Needs these characters: ` not sure why)
+
+	function coordtrack(){
+		const coordstext = document.getElementById('teststats');coordstext.textContent = `${Player.x}, ${Player.y}`};
 
 	// COLLISION FUNCTION
 
@@ -60,9 +73,14 @@ window.addEventListener('load', function () {
 		return Player.y >= groundHeight;
 	};
 
+	let parachuteCooldown = true;
+	
 	function jump() {
-		if (keys[' '] && onGround()) { Player.velocityY = -12;};
-	};
+		if (keys[' '] && onGround()) {Player.velocityY = -14, parachuteCooldown = true; setTimeout(parachute)};};
+	
+	function parachute() {
+		if (keys['q'] && !onGround()) {parachuteCooldown = true}
+		if (Player.velocityY < -12) Player.velocityY = -12;};
 
 	function boundingBox(Player) {
 		if (Player.y < ceilingHeight) { Player.y = ceilingHeight, Player.velocityY = 0 }
@@ -83,9 +101,13 @@ window.addEventListener('load', function () {
 		// KEY CHECK AND BINDINGS
 
 		jump();
+		parachute();
+
 		const speed = keys['c'] ? Player.speed + 1.75 : Player.speed;
 		if (keys['a']) Player.x -= speed;
 		if (keys['d']) Player.x += speed;
+
+		if (Player.y == groundHeight) Player.gravity = 0.4;
 
 		Player.velocityY += Player.gravity; Player.y += Player.velocityY
 
@@ -99,6 +121,7 @@ window.addEventListener('load', function () {
 
 		collisionDetecting(Player, Chicken);
 		boundingBox(Player);
+		coordtrack();
 
 		// NEXT FRAME
 
