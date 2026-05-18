@@ -24,6 +24,12 @@ window.addEventListener('load', function () {
 	brick_bg.width = 1432
 	brick_bg.height = 768
 
+	// PARACHUTE OBJECT
+
+	var parachuteImage = new Image();
+	parachuteImage.src = 'assets/parachute.png';
+	var Parachute = {x: 0, y: 0, width:64, height:64,};
+
 	//PLAYER OBJECT
 
 	var playerImage = new Image();
@@ -33,8 +39,12 @@ window.addEventListener('load', function () {
 	// KEY CONTROL EVENT LISTENERS
 
 	const keys = {};
-	window.addEventListener('keydown', function (e) { e.preventDefault(); keys[e.key] = true; });
-	window.addEventListener('keyup', function (e) { e.preventDefault(); keys[e.key] = false; });
+
+	window.addEventListener('keydown', function (e) {keys[e.key] = true;
+	const runDirection = ["a", "d"];
+	if (runDirection.includes(e.key) || e.ctrlKey) {e.preventDefault();}});
+		//this doesnt stop ctrl+W sadly
+	window.addEventListener('keyup', function (e) {keys[e.key] = false; });
 
 	// MUSIC & SOUND FUNCTIONS
 
@@ -46,9 +56,7 @@ window.addEventListener('load', function () {
 
 	const musicToggle = document.getElementById('musicbtn');
 	const soundToggle = document.getElementById('soundbtn');
-
 	musicToggle.addEventListener("click", () => {MusicChilderness.muted = !MusicChilderness.muted});
-
 	soundToggle.addEventListener("click", () => {SoundCollide.muted = !SoundCollide.muted});
 
 	// COORDINATE TRACKER (Needs these characters: ` not sure why)
@@ -70,24 +78,20 @@ window.addEventListener('load', function () {
 	const ceilingHeight = -5;
 
 	function onGround() {
-		return Player.y >= groundHeight;
-	};
-
-	let parachuteCooldown = true;
+		return Player.y >= groundHeight;};
 	
 	function jump() {
-		if (keys[' '] && onGround()) {Player.velocityY = -14, parachuteCooldown = true; setTimeout(parachute)};};
+		if (keys[' '] && onGround()) {Player.velocityY = -14};};
 	
 	function parachute() {
-		if (keys['q'] && !onGround()) {parachuteCooldown = true}
-		if (Player.velocityY < -12) Player.velocityY = -12;};
+		if (keys[' '] && !onGround() && Player.velocityY > 0) {Player.gravity=0.025};
+		if (Player.velocityY < -17) Player.velocityY = -17;};
 
 	function boundingBox(Player) {
 		if (Player.y < ceilingHeight) { Player.y = ceilingHeight, Player.velocityY = 0 }
 		else if (Player.y > groundHeight) { Player.y = groundHeight, Player.velocityY = 0 }
 		else if (Player.x < -5) { Player.x = -5 }
-		else if (Player.x > 1250) { Player.x = 1250 }
-	};
+		else if (Player.x > 1250) { Player.x = 1250 }};
 
 	// MUSIC
 
@@ -103,7 +107,7 @@ window.addEventListener('load', function () {
 		jump();
 		parachute();
 
-		const speed = keys['c'] ? Player.speed + 1.75 : Player.speed;
+		const speed = keys['Control'] ? Player.speed + 1.75 : Player.speed;
 		if (keys['a']) Player.x -= speed;
 		if (keys['d']) Player.x += speed;
 
@@ -111,11 +115,18 @@ window.addEventListener('load', function () {
 
 		Player.velocityY += Player.gravity; Player.y += Player.velocityY
 
-		// DRAW OBJECTS (PLAYER AND ROCK)
+		// DRAW OBJECTS (PLAYER, CHICKEN, PARACHUTE)
+
+		context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height);
 
 		context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height);
+
 		context.drawImage(titleImage, GameTitle.x, GameTitle.y, GameTitle.width, GameTitle.height);
+
 		context.drawImage(chickenImage, Chicken.x, Chicken.y, Chicken.width, Chicken.height);
+
+		Parachute.x = Player.x
+		Parachute.y = Player.y - 32
 
 		// CALLING COLLISION AND BOUNDING FUNCTION
 
@@ -125,8 +136,7 @@ window.addEventListener('load', function () {
 
 		// NEXT FRAME
 
-		requestAnimationFrame(gameloop);
-	};
+		requestAnimationFrame(gameloop);};
 
 	playerImage.onload = gameloop
 })
