@@ -4,8 +4,10 @@ window.addEventListener('load', function () {
 	const gamespace = document.getElementById('gamespace');
 	const brick_bg = this.document.getElementById('brick_bg');
 	const context = gamespace.getContext('2d');
+	const nullImage = new Image();
+	nullImage.src = 'assets/null.png';
 
-	//GAMETITLE (not sure if I need it so i replaced it with assets/null)
+	//GAMETITLE (not using yet so I have replaced it with assets/null)
 
 	const titleImage = new Image();
 	titleImage.src = 'assets/null.png';
@@ -25,14 +27,16 @@ window.addEventListener('load', function () {
 	const wallLeft = -8;
 	const wallRight = 1224;
 
-	const ground = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	const ground = [[0,0,0,0,3,0,0,0,0,0,0,3,3,0,0,0,0,0,0,0],
+					[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 					[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]];
-					
+					// needs cleaning up when I fill the whole gamespace with ground, decoration and semi-solid elements.
 	function drawGround() {
 		for (let row = 0; row < ground.length; row++)
 			{for(let col = 0; col < ground[row].length; col++){const tile = ground[row][col];
-			if (tile === 1) {context.drawImage(snowtileImage, col * 64, groundHeight + (64) + row * 64, 64, 64);}
-			if (tile === 2) {context.drawImage(dirttileImage, col * 64, groundHeight + (64) + row * 64, 64, 64);}}}};
+			if (tile === 1) {context.drawImage(snowtileImage, col * 64, groundHeight + row * 64, 64, 64);}
+			if (tile === 2) {context.drawImage(dirttileImage, col * 64, groundHeight + row * 64, 64, 64);}
+			if (tile === 3) {context.drawImage(nullImage, col * 64, groundHeight + row * 64, 64, 64);}}}};
 
 	const snowtileImage = new Image();
 	snowtileImage.src = 'assets/tiles/snowtile.png';
@@ -56,7 +60,23 @@ window.addEventListener('load', function () {
 	var playerImage = new Image();
 	playerImage.src = 'assets/goat/goatright.png';
 	var Player = { x: 184, y: 150, width: 64, height: 64, speed: 3, gravity: 0.4, velocityY: 0};
-	var Health = 5;
+
+	//HEALTH, HEALTH BAR AND DEATH SCREEN VARIABLES
+
+	var health = 5;
+	var dead = false;
+	var deathTimer = 0;
+	var healthBar = []
+
+	const heartemptyImage = new Image();
+	heartemptyImage.src = 'assets/ui/heart_empty.png';
+	const heartfullImage = new Image();
+	heartfullImage.src = 'assets/ui/heart_full.png';
+
+	function drawHealth() {
+		for(let bar = 0; bar < healthBar.length; bar ++)
+			if (healthBar[bar] === 1) {context.drawImage(heartfullImage, [bar] * 48 + 16, 16, 32, 32);}
+			else{if (healthBar[bar] === 0) {context.drawImage(heartemptyImage, [bar] * 48 + 16, 16, 32, 32);}}};
 
 	// KEY CONTROL EVENT LISTENERS
 
@@ -70,18 +90,22 @@ window.addEventListener('load', function () {
 
 	// MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
 
-	var SoundCollide = new Audio('assets/sounds/hurt.wav');
-	SoundCollide.loop = false;
-	var MusicChilderness = new Audio('assets/sounds/childerness.wav');
-	MusicChilderness.loop = true;
-	MusicChilderness.autoplay = true;
+	var SoundCollide = new Audio('assets/sounds/hurt.wav');SoundCollide.loop = false;
+	var SoundParachuteDeployed = new Audio('assets/sounds/parachutedeployed.wav'); SoundParachuteDeployed.loop = false;
+	var MusicChilderness = new Audio('assets/sounds/childerness.wav'); MusicChilderness.loop = true; MusicChilderness.autoplay = true;
+	var MusicDead = new Audio('assets/sounds/dead.wav'); MusicDead.loop = false;
 
 	const musicToggle = document.getElementById('musicbtn');
+	musicToggle.src = 'assets/ui/drum.png';
+	musicToggle.width = 32; musicToggle.height = 32;
 	const soundToggle = document.getElementById('soundbtn');
-	musicToggle.addEventListener("click", () => {MusicChilderness.muted = !MusicChilderness.muted});
-	soundToggle.addEventListener("click", () => {SoundCollide.muted = !SoundCollide.muted});
+	soundToggle.src = 'assets/ui/horn.png';
+	soundToggle.width = 32; musicToggle.height = 32;
 
-	// COORDINATE TRACKER (Needs these characters: ` not sure why)
+	musicToggle.addEventListener("click", () => {MusicChilderness.muted = !MusicChilderness.muted, MusicDead.muted = !MusicDead.muted});
+	soundToggle.addEventListener("click", () => {SoundCollide.muted = !SoundCollide.muted, SoundParachuteDeployed.muted = !SoundParachuteDeployed.muted});
+
+	// COORDINATE TRACKER (Needs these c haracters: ` not sure why)
 
 	function coordtrack() {
 		const coordstext = document.getElementById('teststats'); coordstext.textContent = `${Math.round(Player.x)}, ${Math.round(Player.y)}`};
@@ -92,17 +116,12 @@ window.addEventListener('load', function () {
 	const CollisionCooldown = 1000;
 
 	function collsionSoundLog(direction) {const now = Date.now();
-		if (now - lastCollision >= CollisionCooldown) {SoundCollide.play(); console.log("colliding with enemy", direction,), lastCollision = now, Health -= 1}
-	};
+		if (now - lastCollision >= CollisionCooldown) {SoundCollide.play(); console.log("colliding with enemy", direction,), lastCollision = now, health -= 1}};
 
 	function collisionDetecting(Player, Chicken) {
-		
-		if (Player.x >= Chicken.x && Player.x <= Chicken.x + 48 && Player.y -2 > Chicken.y -2 && Health > 0) {collsionSoundLog("to your left"), Player.x = Chicken.x + 48};
-
-		if (Player.x >= Chicken.x - 48 && Player.x <= Chicken.x && Player.y -2 > Chicken.y -2 && Health > 0) {collsionSoundLog("to your right"), Player.x = Chicken.x - 48;};
-
-		if (Player.y >= Chicken.y - 52 && Player.y <= Chicken.y + 32 && Player.x <= Chicken.x + 32 && Player.x >= Chicken.x - 32 && Health) {collsionSoundLog("below"), Player.y = Chicken.y - 52, Player.velocityY = 0};
-	};
+		if (Player.x >= Chicken.x && Player.x <= Chicken.x + 48 && Player.y -2 > Chicken.y -2 && health > 0) {collsionSoundLog("to your left"), Player.x = Chicken.x + 48};
+		if (Player.x >= Chicken.x - 48 && Player.x <= Chicken.x && Player.y -2 > Chicken.y -2 && health > 0) {collsionSoundLog("to your right"), Player.x = Chicken.x - 48;};
+		if (Player.y >= Chicken.y - 52 && Player.y <= Chicken.y + 32 && Player.x <= Chicken.x + 32 && Player.x >= Chicken.x - 32 && health) {collsionSoundLog("below"), Player.y = Chicken.y - 52, Player.velocityY = 0};};
 
 	// BOUNDING, ONGROUND, JUMP AND PARACHUTE FUNCTIONS
 
@@ -114,7 +133,7 @@ window.addEventListener('load', function () {
 	
 	var parachuteDeployed = false;
 	function parachute() {
-		{Player.gravity=0.025, parachuteDeployed = true};};
+		{Player.gravity=0.025, parachuteDeployed = true; SoundParachuteDeployed.play();};};
 
 	function boundingBox(Player) {
 		if (Player.y > groundHeight && Player.x > wallRight) {Player.y = groundHeight, Player.velocityY = 0, Player.x = wallRight}
@@ -136,6 +155,7 @@ window.addEventListener('load', function () {
 		// DRAW GROUND FUNCTION CALLED
 
 		drawGround();
+		drawHealth();
 
 		// KEY CHECKS, SPEED, VELOCITY AND PARACHUTE REGULATION
 
@@ -151,15 +171,23 @@ window.addEventListener('load', function () {
 
 		if (Player.velocityY < -17) {Player.velocityY = -17};
 
-		// DRAW OBJECTS (PARACHUTE, PLAYER (INCLUDING DEAD SPRITE), CHICKEN, TITLE)
-
-		if (parachuteDeployed == true) {Parachute.x = Player.x
-		Parachute.y = Player.y - 32, context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height);}
-
-		if (Health > 0) {context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height);}
-		else {playerImage.src = 'assets/goat/deadgoat.png', Player.speed = 0, Player.gravity = 0, Player.velocityY = 0, context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height)}
+		// DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
 
 		{context.drawImage(chickenImage, Chicken.x, Chicken.y, Chicken.width, Chicken.height); Chicken.x};
+
+		if (parachuteDeployed == true && dead == false) {Parachute.x = Player.x
+		Parachute.y = Player.y - 32, context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height);}
+
+		if (health === 5) healthBar = [1,1,1,1,1];
+		else{if (health === 4) healthBar = [1,1,1,1,0];
+		if (health === 3) healthBar = [1,1,1,0,0];
+		if (health === 2) healthBar = [1,1,0,0,0];
+		if (health === 1) healthBar = [1,0,0,0,0];
+		if (health === 0) healthBar = [0,0,0,0,0];}
+
+		if (health > 0) {context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height);}
+		else {dead = true; playerImage.src = 'assets/goat/deadgoat.png'; context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
+		if (deathTimer < 1) deathTimer += 0.001; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0,'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1*deathTimer}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7*deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; {MusicChilderness.muted = true};MusicDead.play();};
 
 		context.drawImage(titleImage, GameTitle.x, GameTitle.y, GameTitle.width, GameTitle.height);
 
@@ -175,3 +203,6 @@ window.addEventListener('load', function () {
 
 	playerImage.onload = gameloop
 })
+
+//THINGS TO WORK ON: Screen scrolling, enemy movement, animation, temperature bar, fixed object-based collision for ground features 
+//LESS IMPORTANT: Sound design, texturing, niche/minor features 
