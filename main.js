@@ -162,12 +162,12 @@ window.addEventListener('load', function () {
 		if (keys[' '] && onGround()) {jump();}
 		if (Player.y == groundHeight) {Player.gravity = 0.4, parachuteDeployed = false};
 
-		const speed = keys['Control'] ? Player.speed + 1.75 : Player.speed;
-		Player.velocityY += Player.gravity; Player.y += Player.velocityY
+		if (dead == false) {var speed = keys['Control'] ? Player.speed + 1.75 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY;}
+		else{speed = Player.speed = 0; Player.velocityY = 0; Player.gravity = 0};
 
-		if (keys['a']) {Player.x -= speed}
-		if (keys['d']) {Player.x += speed}
-		if (keys[' '] && !onGround() && Player.velocityY > 0) {parachute();}
+		if (keys['a']) {Player.x -= speed};
+		if (keys['d']) {Player.x += speed};
+		if (keys[' '] && !onGround() && Player.velocityY > 0) {parachute();};
 
 		if (Player.velocityY < -17) {Player.velocityY = -17};
 
