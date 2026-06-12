@@ -18,21 +18,24 @@ window.addEventListener('load', function () {
 
 	//CANVAS AND BACKGROUND DIMENSIONS
 
-	gamespace.width = 1280
+	gamespace.width = 5120
 	gamespace.height = 704
-	brick_bg.width = 1432
-	brick_bg.height = 768
+	brick_bg.width = 5240
+	brick_bg.height = 770
 
 	// GROUND DIMENSIONS AND DRAWING (function is looking through each row and mapping the tile texture to each corresponding integer)
 
 	const groundHeight = 512;
 	const ceilingHeight = -5;
 	const wallLeft = -8;
-	const wallRight = 1224;
+	const wallRight = 1224 + scrollWin;
+	var scrollLocation = 1224
 
-	const ground = [[0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]];
+	const ground = [
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
+	[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]];
 
 	// needs cleaning up when I fill the whole gamespace with ground, decoration and semi-solid elements.
 
@@ -40,9 +43,9 @@ window.addEventListener('load', function () {
 		for (let row = 0; row < ground.length; row++) {
 			for (let col = 0; col < ground[row].length; col++) {
 				const tile = ground[row][col];
-				if (tile === 1) { context.drawImage(snowtileImage, col * 64, groundHeight + row * 64, 64, 64); }
-				if (tile === 2) { context.drawImage(dirttileImage, col * 64, groundHeight + row * 64, 64, 64); }
-				if (tile === 3) { context.drawImage(nullImage, col * 64, groundHeight + row * 64, 64, 64); }
+				if (tile === 1) { context.drawImage(snowtileImage, col * 64, groundHeight - 64 + row * 64, 64, 64); }
+				if (tile === 2) { context.drawImage(dirttileImage, col * 64, groundHeight - 64 + row * 64, 64, 64); }
+				if (tile === 3) { context.drawImage(nullImage, col * 64, groundHeight - 64 + row * 64, 64, 64); }
 			}
 		}
 	};
@@ -84,9 +87,9 @@ window.addEventListener('load', function () {
 
 	function drawHealth() {
 		for (let bar = 0; bar < healthBar.length; bar++)
-			if (healthBar[bar] === 1) { context.drawImage(heartfullImage, [bar] * 48 + 16, 16, 32, 32); }
-			else { if (healthBar[bar] === 0) { context.drawImage(heartemptyImage, [bar] * 48 + 16, 16, 32, 32); } }
-	};
+			if (healthBar[bar] === 1) { context.drawImage(heartfullImage, [bar] * 48 + scrollLocation - 1208, 16, 32, 32); }
+			else { if (healthBar[bar] === 0) { context.drawImage(heartemptyImage, [bar] * 48 + scrollLocation - 1208, 16, 32, 32); } }
+	}; // changing heart mechanics to fit the scroll
 
 	// KEY CONTROL EVENT LISTENERS
 
@@ -165,6 +168,18 @@ window.addEventListener('load', function () {
 		else if (Player.x > wallRight) { Player.x = wallRight }
 	};
 
+	// function boundingBox(Player) {
+	// 	if (Player.y > snowtileImage.y) { Player.y = snowtileImage.y + 512, Player.velocityY = 0 };}
+
+	// working on how to collide with the ground based on the tile below
+
+	function scrollWin() {
+  	if (Player.x > scrollLocation && pause != true) {window.scrollBy(1124, 0); scrollLocation += 1124}
+} // probably will change this to better and smoother scroll. it will also go both ways
+
+
+
+
 	// MUSIC PLAYING
 
 	MusicChilderness.play();
@@ -178,6 +193,7 @@ window.addEventListener('load', function () {
 
 		drawGround();
 		drawHealth();
+		scrollWin();
 
 		// DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
 
@@ -201,7 +217,7 @@ window.addEventListener('load', function () {
 		if (health > 0) { context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height); }
 		else {
 			dead = true; playerImage.src = 'assets/goat/deadgoat.png'; context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
-			if (deathTimer < 1) deathTimer += 0.001; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent != "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play();
+			if (deathTimer < 1) deathTimer += 0.001; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play();
 		};
 
 		// PAUSE MECHANICS
@@ -210,7 +226,9 @@ window.addEventListener('load', function () {
 
 		if (keys['p'] && !pausecheck) { pause = !pause };
 		pausecheck = keys['p'];
-		if (pause == true) { pauseScreen.textContent = "||" } else { pauseScreen.textContent = " " }
+		if (pause == true && health > 0) { pauseScreen.textContent = "||";}
+		else if (health > 0) {pauseScreen.textContent = " "}
+		else if (dead == true) { pauseScreen.textContent = "reloading..."; pauseScreen.textContent = " "; history.go(0);}
 
 		if (!pause) { GameUpdates(); };
 		function GameUpdates() {
