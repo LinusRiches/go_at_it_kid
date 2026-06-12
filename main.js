@@ -1,8 +1,6 @@
-//#region	🐐 GAME
+//#region 	🟥 MAIN VARIABLES AND CONSTANTS
 
-	//#region 	🟥 MAIN VARIABLES AND CONSTANTS
-
-		//#region 🟠 INITIAL LOAD, CANVAS, PAUSE AND BACKGROUND CONSTANTS AND DIMENSIONS
+//#region 🟠 INITIAL LOAD, CANVAS, PAUSE & BACKGROUND CONSTANTS & DIMENSIONS
 
 window.addEventListener('load', function () {
 
@@ -14,15 +12,14 @@ window.addEventListener('load', function () {
 	brick_bg.height = 770
 	const context = gamespace.getContext('2d');
 	const pauseScreen = document.getElementById('pausescreen')
-	window.scrollBy(-1000, 0)
 	let pause = true;
 	let pausecheck = false;
 	let parachutecheck = false;
 	let parachuteDeployed = false;
 
-	//#endregion
+//#endregion
 
-		//#region 🟠 TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
+//#region 🟠 TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
 
 	const nullImage = new Image();
 	nullImage.src = 'assets/null.png';
@@ -32,13 +29,12 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-		//#region 🟠 GROUND DIMENSIONS AND DRAWING (function is looking through each row, mapping the tile texture to each corresponding integer)
+//#region 🟠 GROUND DIMENSIONS & DRAWING (function is looking through each row, mapping the tile texture to each corresponding integer)
 
-	var scrollLocation = 1224
 	const groundHeight = 512;
 	const ceilingHeight = -5;
 	const wallLeft = -8;
-	var wallRight = scrollLocation + 5000;
+	const wallRight = 1224;
 		// wallRight will be like this until I figure out how it works
 	const snowtileImage = new Image();
 	snowtileImage.src = 'assets/tiles/snowtile.png';
@@ -65,7 +61,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-		//#region 🟠 CHICKEN, PARACHUTE AND PLAYER OBJECTS
+//#region 🟠 CHICKEN, PARACHUTE & PLAYER OBJECTS
 
 	const chickenImage = new Image();
 	chickenImage.src = 'assets/enemies/chicken.png';
@@ -81,7 +77,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-		//#region 🟠 HEALTH, HEALTH BAR AND DEATH SCREEN VARIABLES 
+//#region 🟠 HEALTH, HEALTH BAR & DEATH SCREEN VARIABLES 
 
 	const heartemptyImage = new Image();
 	heartemptyImage.src = 'assets/ui/heart_empty.png';
@@ -90,17 +86,17 @@ window.addEventListener('load', function () {
 	var health = 5;
 	var dead = false;
 	var deathTimer = 0;
-	var healthBar = []
+	var healthBar = [];
 
 	function drawHealth() {
 		for (let bar = 0; bar < healthBar.length; bar++)
-			if (healthBar[bar] === 1) { context.drawImage(heartfullImage, [bar] * 48 + scrollLocation - 1208, 16, 32, 32); }
-			else { if (healthBar[bar] === 0) { context.drawImage(heartemptyImage, [bar] * 48 + scrollLocation - 1208, 16, 32, 32); } }
-	};	// changing heart mechanics to fit the scroll
+			if (healthBar[bar] === 1) { context.drawImage(heartfullImage, [bar] * 48 + 16, 16, 32, 32); }
+			else { if (healthBar[bar] === 0) { context.drawImage(heartemptyImage, [bar] * 48 + 16, 16, 32, 32); } }
+	};
 
 //#endregion
 
-		//#region 🟠 KEY CONTROL EVENT LISTENERS
+//#region 🟠 RUN DIRECTION KEY EVENT LISTENERS
 
 	const keys = {};
 
@@ -114,7 +110,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-		//#region 🟠 MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
+//#region 🟠 MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
 
 	var SoundCollide = new Audio('assets/sounds/hurt.wav'); SoundCollide.loop = false;
 	var SoundParachuteDeployed = new Audio('assets/sounds/parachutedeployed.wav'); SoundParachuteDeployed.loop = false;
@@ -133,14 +129,14 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-		//#region 🟠 COORDINATE TRACKER (Needs these c haracters: `)
+//#region 🟠 COORDINATE TRACKER (Needs these characters: `)
 
 	function coordtrack() {
 		const coordstext = document.getElementById('teststats'); coordstext.textContent = `${Math.round(Player.x)}, ${Math.round(Player.y)}`
 	};
 //#endregion
 
-		//#region 🟠 COLLISION, BOUNDING, ONGROUND, JUMP PARACHUTE AND SCROLL FUNCTIONS
+//#region 🟠 COLLISION, BOUNDING, ONGROUND, JUMP & PARACHUTE FUNCTIONS
 
 	let lastCollision = 0;
 	const CollisionCooldown = 1000;
@@ -182,38 +178,33 @@ window.addEventListener('load', function () {
 		}; parachutecheck = keys[' '];
 	};
 
-	function scrollWin() {
-		if (Player.x > scrollLocation && pause != true) { window.scrollBy(1124, 0); scrollLocation += 1124 }
-	}; 	// will change this to better and smoother scroll. it will also go both ways
-
 //#endregion
 
-		//#region 🟠 MUSIC PLAY ON LOAD (BUGGED)
+//#region 🟠 MUSIC PLAY ON LOAD (BUGGED)
 
 	MusicChilderness.play();
 
 //#endregion
 
-	//#endregion🟥
+//#endregion🟥
 
-	//#region	🟧 GAMELOOP
+//#region	🟧 GAMELOOP
 
-		//#region 🟢 GAMELOOP FUNCTION
+//#region 🟢 GAMELOOP FUNCTION
 
 	function gameloop() {
 		context.clearRect(0, 0, gamespace.width, gamespace.height); context.imageSmoothingEnabled = false;
 
-		//#endregion
+//#endregion
 
-		//#region 🟢 DRAW GROUND FUNCTION CALLED
+//#region 🟢 DRAW GROUND FUNCTION CALLED
 
 		drawGround();
 		drawHealth();
-		scrollWin();
 
-	//#endregion
+//#endregion
 
-		//#region 🟢 HEALTH CHECK
+//#region 🟢 HEALTH CHECK
 
 		if (health > 0) { dead = false } else if (health <= 0) { dead = true };
 		if (health === 5) healthBar = [1, 1, 1, 1, 1];
@@ -225,9 +216,9 @@ window.addEventListener('load', function () {
 			if (health === 0) healthBar = [0, 0, 0, 0, 0];
 		}
 
-	//#endregion
+//#endregion
 
-		//#region 🟢 DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
+//#region 🟢 DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
 
 		context.drawImage(titleImage, GameTitle.x, GameTitle.y, GameTitle.width, GameTitle.height);
 
@@ -241,9 +232,9 @@ window.addEventListener('load', function () {
 			if (deathTimer < 1) deathTimer += 0.001; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play();
 		};
 
-	//#endregion
+//#endregion
 
-		//#region 🟢 PAUSE MECHANICS
+//#region 🟢 PAUSE MECHANICS
 
 		if (keys['p'] && !pausecheck && dead == false) { pause = !pause };
 		pausecheck = keys['p'];
@@ -254,9 +245,9 @@ window.addEventListener('load', function () {
 		if (!pause) { GameUpdates(); };
 		function GameUpdates() {
 
-	//#endregion
+//#endregion
 
-		//#region 🟢 KEY CHECKS, SPEED, VELOCITY AND PARACHUTE REGULATION
+//#region 🟢 KEY CHECKS, SPEED, VELOCITY AND PARACHUTE REGULATIONS
 
 			if (keys[' '] && onGround()) { jump(); }
 			if (Player.y == groundHeight) { Player.gravity = 0.4, parachuteDeployed = false };
@@ -272,7 +263,7 @@ window.addEventListener('load', function () {
 
 	//#endregion
 
-		//#region 🟢 CALLING COLLISION AND BOUNDING FUNCTIONS
+//#region 🟢 CALLING COLLISION AND BOUNDING FUNCTIONS
 
 			collisionDetecting(Player, Chicken);
 			boundingBox(Player);
@@ -281,25 +272,27 @@ window.addEventListener('load', function () {
 
 	//#endregion
 
-		//#region 🟢 NEXT FRAME
+//#region 🟢 NEXT FRAME
 
 		requestAnimationFrame(gameloop);
-	//#endregion
-	};
-	//#endregion🟩
 
-	//#region 	🟨 GAMELOOP CALL
+//#endregion
+
+	};
+
+//#endregion🟧
+
+//#region 	🟨 GAMELOOP CALL
 
 	playerImage.onload = gameloop
 })
 
-	//#endregion🟨
+//#endregion🟨
 	
-	//#region 	🟩 NOTES
+//#region 	🟩 NOTES
 
-// THINGS TO WORK ON: Screen scrolling, enemy movement, animation, temperature bar, fixed object-based collision for ground features
+// THINGS TO WORK ON: Screen scrolling (MOVING SCREEN AROUND THE PLAYER RATHER THAN MOVING THE WHOLE HTML DOC), enemy movement, animation, temperature bar, fixed object-based collision for ground features
 // LESS IMPORTANT: Sound design, texturing, niche/minor features
+// CURRENT THING: SCREEN SCROLL MECHANIC - MAKE THE SCREEN MOVE AROUND THE PLAYER
 
-	//#endregion🟦
-
-//#endregion🐐
+//#endregion🟩
