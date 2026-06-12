@@ -112,7 +112,8 @@ window.addEventListener('load', function () {
 
 //#region 🟠 MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
 
-	var SoundCollide = new Audio('assets/sounds/hurt.wav'); SoundCollide.loop = false;
+	var CollisionSounds = [('assets/sounds/hurt.wav'), ('assets/sounds/hurt2.wav')];
+	var DeathSound = new Audio('assets/sounds/death.wav');
 	var SoundParachuteDeployed = new Audio('assets/sounds/parachutedeployed.wav'); SoundParachuteDeployed.loop = false;
 	var MusicChilderness = new Audio('assets/sounds/childerness.wav'); MusicChilderness.loop = true; MusicChilderness.autoplay = true;
 	var MusicDead = new Audio('assets/sounds/dead.wav'); MusicDead.loop = false;
@@ -125,7 +126,7 @@ window.addEventListener('load', function () {
 	soundToggle.width = 32; musicToggle.height = 32;
 
 	musicToggle.addEventListener("click", () => { MusicChilderness.muted = !MusicChilderness.muted, MusicDead.muted = !MusicDead.muted });
-	soundToggle.addEventListener("click", () => { SoundCollide.muted = !SoundCollide.muted, SoundParachuteDeployed.muted = !SoundParachuteDeployed.muted });
+	soundToggle.addEventListener("click", () => { ChosenCollisionSound.muted = !ChosenCollisionSound.muted, SoundParachuteDeployed.muted = !SoundParachuteDeployed.muted });
 
 //#endregion
 
@@ -148,7 +149,10 @@ window.addEventListener('load', function () {
 	};
 
 	function collsionSoundLog(direction)
-	{ const now = Date.now(); if (now - lastCollision >= CollisionCooldown) { SoundCollide.play(); console.log("colliding with enemy", direction,), lastCollision = now, health -= 1 }
+	{ const now = Date.now(); if (now - lastCollision >= CollisionCooldown)
+		{ console.log("colliding with enemy", direction), lastCollision = now, health -= 1;
+			if (health > 0) {var RandomCollisionSound = [Math.floor(Math.random() * 2)]; var ChosenCollisionSound = new Audio (CollisionSounds[RandomCollisionSound]); ChosenCollisionSound.play(); }
+			else {DeathSound.play(); } }
 	};
 
 	function boundingBox(Player) {
@@ -172,10 +176,9 @@ window.addEventListener('load', function () {
 	};
 
 	function parachute() {
-		{
-			Player.gravity = 0.025, parachuteDeployed = true;
+		Player.gravity = 0.025, parachuteDeployed = true;
 			if (!parachutecheck && Player.gravity < 1) { SoundParachuteDeployed.play(); }
-		}; parachutecheck = keys[' '];
+		parachutecheck = keys[' '];
 	};
 
 //#endregion
