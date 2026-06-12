@@ -1,6 +1,8 @@
-//#region	🟥 MAIN VARIABLES AND CONSTANTS
+//#region	🐐 GAME
 
-	//#region 🟠 INITIAL LOAD, CANVAS, PAUSE AND BACKGROUND CONSTANTS AND DIMENSIONS
+	//#region 	🟥 MAIN VARIABLES AND CONSTANTS
+
+		//#region 🟠 INITIAL LOAD, CANVAS, PAUSE AND BACKGROUND CONSTANTS AND DIMENSIONS
 
 window.addEventListener('load', function () {
 
@@ -20,7 +22,7 @@ window.addEventListener('load', function () {
 
 	//#endregion
 
-	//#region 🟠 TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
+		//#region 🟠 TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
 
 	const nullImage = new Image();
 	nullImage.src = 'assets/null.png';
@@ -30,7 +32,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 GROUND DIMENSIONS AND DRAWING (function is looking through each row, mapping the tile texture to each corresponding integer)
+		//#region 🟠 GROUND DIMENSIONS AND DRAWING (function is looking through each row, mapping the tile texture to each corresponding integer)
 
 	var scrollLocation = 1224
 	const groundHeight = 512;
@@ -63,7 +65,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 CHICKEN, PARACHUTE AND PLAYER OBJECTS
+		//#region 🟠 CHICKEN, PARACHUTE AND PLAYER OBJECTS
 
 	const chickenImage = new Image();
 	chickenImage.src = 'assets/enemies/chicken.png';
@@ -79,7 +81,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 HEALTH, HEALTH BAR AND DEATH SCREEN VARIABLES 
+		//#region 🟠 HEALTH, HEALTH BAR AND DEATH SCREEN VARIABLES 
 
 	const heartemptyImage = new Image();
 	heartemptyImage.src = 'assets/ui/heart_empty.png';
@@ -98,7 +100,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 KEY CONTROL EVENT LISTENERS
+		//#region 🟠 KEY CONTROL EVENT LISTENERS
 
 	const keys = {};
 
@@ -112,7 +114,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
+		//#region 🟠 MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
 
 	var SoundCollide = new Audio('assets/sounds/hurt.wav'); SoundCollide.loop = false;
 	var SoundParachuteDeployed = new Audio('assets/sounds/parachutedeployed.wav'); SoundParachuteDeployed.loop = false;
@@ -131,14 +133,14 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 COORDINATE TRACKER (Needs these c haracters: `)
+		//#region 🟠 COORDINATE TRACKER (Needs these c haracters: `)
 
 	function coordtrack() {
 		const coordstext = document.getElementById('teststats'); coordstext.textContent = `${Math.round(Player.x)}, ${Math.round(Player.y)}`
 	};
 //#endregion
 
-	//#region 🟠 COLLISION, BOUNDING, ONGROUND, JUMP PARACHUTE AND SCROLL FUNCTIONS
+		//#region 🟠 COLLISION, BOUNDING, ONGROUND, JUMP PARACHUTE AND SCROLL FUNCTIONS
 
 	let lastCollision = 0;
 	const CollisionCooldown = 1000;
@@ -186,15 +188,15 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-	//#region 🟠 MUSIC PLAY ON LOAD (BUGGED)
+		//#region 🟠 MUSIC PLAY ON LOAD (BUGGED)
 
 	MusicChilderness.play();
 
 //#endregion
 
-//#endregion 🟥
+	//#endregion🟥
 
-	//#region 🟩 🟢 GAMELOOP 🟢 GAMELOOP 🟢 GAMELOOP 🟢 GAMELOOP 🟢 GAMELOOP 🟢 GAMELOOP 🟢 GAMELOOP 🟢 GAMELOOP 🟢
+	//#region	🟧 GAMELOOP
 
 		//#region 🟢 GAMELOOP FUNCTION
 
@@ -284,18 +286,20 @@ window.addEventListener('load', function () {
 		requestAnimationFrame(gameloop);
 	//#endregion
 	};
-	//#endregion 🟩
+	//#endregion🟩
 
-	//#region	🟨 🟠 GAMELOOP CALL
+	//#region 	🟨 GAMELOOP CALL
 
 	playerImage.onload = gameloop
 })
 
 	//#endregion🟨
 	
-	//#region	🟦 NOTES
+	//#region 	🟩 NOTES
 
 // THINGS TO WORK ON: Screen scrolling, enemy movement, animation, temperature bar, fixed object-based collision for ground features
 // LESS IMPORTANT: Sound design, texturing, niche/minor features
 
 	//#endregion🟦
+
+//#endregion🐐
