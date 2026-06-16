@@ -7,8 +7,8 @@ window.addEventListener('load', function () {
 	const gamespace = document.getElementById('gamespace');
 	gamespace.width = 5120
 	gamespace.height = 704
-	const brick_bg = this.document.getElementById('brick_bg');
-	brick_bg.width = 5240
+	const brick_bg = this.document.getElementById('brickborder');
+	brick_bg.width = 1436
 	brick_bg.height = 770
 	const context = gamespace.getContext('2d');
 	const pauseScreen = document.getElementById('pausescreen')
@@ -193,7 +193,7 @@ window.addEventListener('load', function () {
 
 //#region	🟧 GAMELOOP
 
-//#region 🟢 GAMELOOP FUNCTION
+//#region 🟢 GAMELOOP FUNCTION (RESETTING CANVAS)
 
 	function gameloop() {
 		context.clearRect(0, 0, gamespace.width, gamespace.height); context.imageSmoothingEnabled = false;
@@ -296,6 +296,9 @@ window.addEventListener('load', function () {
 
 // THINGS TO WORK ON: Screen scrolling (MOVING SCREEN AROUND THE PLAYER RATHER THAN MOVING THE WHOLE HTML DOC), enemy movement, animation, temperature bar, fixed object-based collision for ground features
 // LESS IMPORTANT: Sound design, texturing, niche/minor features
-// CURRENT THING: SCREEN SCROLL MECHANIC - MAKE THE SCREEN MOVE AROUND THE PLAYER
+// CURRENT THING: SCREEN SCROLL MECHANIC - MAKE THE SCREEN MOVE AROUND THE PLAYER. How to do this. Get the Player.x position and make sure the game background and ground elements can be moved around. I may need to redo / remove my background border around the game if it conflict with the movement of the main game elements. (e.g make the background border have a hole in it and move the game elements below that layer.)
+
+
+
 
 //#endregion🟩
