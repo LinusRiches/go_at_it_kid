@@ -1,6 +1,6 @@
 //#region 	🟥 MAIN VARIABLES AND CONSTANTS
 
-//#region 🟠 INITIAL LOAD, CANVAS, PAUSE & BACKGROUND CONSTANTS & DIMENSIONS
+//#region INITIAL LOAD, CANVAS, PAUSE & BACKGROUND CONSTANTS & DIMENSIONS
 
 window.addEventListener('load', function () {
 
@@ -19,7 +19,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟠 TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
+//#region TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
 
 	const nullImage = new Image();
 	nullImage.src = 'assets/null.png';
@@ -29,7 +29,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟠 GROUND DIMENSIONS & DRAWING (function is looking through each row, mapping the tile texture to each corresponding integer)
+//#region GROUND DIMENSIONS & DRAWING (function is looking through each row, mapping the tile texture to each corresponding integer)
 
 	const groundHeight = 512;
 	const ceilingHeight = -5;
@@ -38,8 +38,11 @@ window.addEventListener('load', function () {
 		// wallRight will be like this until I figure out how it works
 	const snowtileImage = new Image();
 	snowtileImage.src = 'assets/tiles/snowtile.png';
+	var Snowtile = {x: 64, y: 256, width: 64, height: 64, speed: 3};
+	Snowtile.size = 64
 	const dirttileImage = new Image();
 	dirttileImage.src = 'assets/tiles/dirttile.png';
+	var groundMovement = 0;
 
 	const ground = [
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -52,16 +55,16 @@ window.addEventListener('load', function () {
 		for (let row = 0; row < ground.length; row++) {
 			for (let col = 0; col < ground[row].length; col++) {
 				const tile = ground[row][col];
-				if (tile === 1) { context.drawImage(snowtileImage, col * 64, groundHeight - 64 + row * 64, 64, 64); }
-				if (tile === 2) { context.drawImage(dirttileImage, col * 64, groundHeight - 64 + row * 64, 64, 64); }
-				if (tile === 3) { context.drawImage(nullImage, col * 64, groundHeight - 64 + row * 64, 64, 64); }
+				if (tile === 1) { context.drawImage(snowtileImage, groundMovement + col * Snowtile.size, groundHeight - Snowtile.size + row * Snowtile.size, Snowtile.size, Snowtile.size); }
+				if (tile === 2) { context.drawImage(dirttileImage, groundMovement + col * 64, groundHeight - 64 + row * 64, 64, 64); }
+				if (tile === 3) { context.drawImage(nullImage, groundMovement + col * 64, groundHeight - 64 + row * 64, 64, 64); }
 			}
 		}
 	};
 
 //#endregion
 
-//#region 🟠 CHICKEN, PARACHUTE & PLAYER OBJECTS
+//#region CHICKEN, PARACHUTE & PLAYER OBJECTS
 
 	const chickenImage = new Image();
 	chickenImage.src = 'assets/enemies/chicken.png';
@@ -73,11 +76,11 @@ window.addEventListener('load', function () {
 
 	var playerImage = new Image();
 	playerImage.src = 'assets/goat/goatright.png';
-	var Player = { x: 184, y: 150, width: 64, height: 64, speed: 3, gravity: 0.4, velocityY: 0 };
+	var Player = { x: 200, y: 150, width: 64, height: 64, speed: 3, gravity: 0.4, velocityY: 0 };
 
 //#endregion
 
-//#region 🟠 HEALTH, HEALTH BAR & DEATH SCREEN VARIABLES 
+//#region HEALTH, HEALTH BAR & DEATH SCREEN VARIABLES 
 
 	const heartemptyImage = new Image();
 	heartemptyImage.src = 'assets/ui/heart_empty.png';
@@ -96,7 +99,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟠 RUN DIRECTION KEY EVENT LISTENERS
+//#region RUN DIRECTION KEY EVENT LISTENERS
 
 	const keys = {};
 
@@ -110,7 +113,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟠 MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
+//#region MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
 
 	var CollisionSounds = [('assets/sounds/hurt.wav'), ('assets/sounds/hurt2.wav')];
 	var DeathSound = new Audio('assets/sounds/death.wav');
@@ -130,14 +133,14 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟠 COORDINATE TRACKER (Needs these characters: `)
+//#region COORDINATE TRACKER (Needs these characters: `)
 
 	function coordtrack() {
 		const coordstext = document.getElementById('teststats'); coordstext.textContent = `${Math.round(Player.x)}, ${Math.round(Player.y)}`
 	};
 //#endregion
 
-//#region 🟠 COLLISION, BOUNDING, ONGROUND, JUMP & PARACHUTE FUNCTIONS
+//#region COLLISION, BOUNDING, ONGROUND, JUMP & PARACHUTE FUNCTIONS
 
 	let lastCollision = 0;
 	const CollisionCooldown = 1000;
@@ -149,7 +152,7 @@ window.addEventListener('load', function () {
 	};
 
 	function collsionSoundLog(direction)
-	{ const now = Date.now(); if (now - lastCollision >= CollisionCooldown)
+	{const now = Date.now(); if (now - lastCollision >= CollisionCooldown)
 		{ console.log("colliding with enemy", direction), lastCollision = now, health -= 1;
 			if (health > 0) {var RandomCollisionSound = [Math.floor(Math.random() * 2)]; var ChosenCollisionSound = new Audio (CollisionSounds[RandomCollisionSound]); ChosenCollisionSound.play(); }
 			else {DeathSound.play(); } }
@@ -177,37 +180,45 @@ window.addEventListener('load', function () {
 
 	function parachute() {
 		Player.gravity = 0.025, parachuteDeployed = true;
-			if (!parachutecheck && Player.gravity < 1) { SoundParachuteDeployed.play(); }
+			if (!parachutecheck && keys[' ']) { SoundParachuteDeployed.play(); }
 		parachutecheck = keys[' '];
 	};
 
 //#endregion
 
-//#region 🟠 MUSIC PLAY ON LOAD (BUGGED)
+//#region MUSIC START FUNCTION (BUGGED)
 
-	MusicChilderness.play();
+function musicStart() {
+	const now = Date.now();
+	let lastMusic = 0;
+	let musicCooldown = 1000;
+	if (now - lastMusic >= musicCooldown) {MusicChilderness.play();};};
 
 //#endregion
 
-//#endregion🟥
+//#endregion🟥 MAIN VARIABLE AND CONSTANTS END
+
+//🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
 
 //#region	🟧 GAMELOOP
 
-//#region 🟢 GAMELOOP FUNCTION (RESETTING CANVAS)
+//#region GAMELOOP FUNCTION (RESETTING CANVAS)
 
 	function gameloop() {
 		context.clearRect(0, 0, gamespace.width, gamespace.height); context.imageSmoothingEnabled = false;
 
 //#endregion
 
-//#region 🟢 DRAW GROUND FUNCTION CALLED
+//#region DRAW GROUND & MUSIC FUNCTION CALLED, DATE.NOW
 
 		drawGround();
-		drawHealth();
+		musicStart();
 
 //#endregion
 
-//#region 🟢 HEALTH CHECK
+//#region HEALTH DRAW AND CHECK
+	
+		drawHealth();
 
 		if (health > 0) { dead = false } else if (health <= 0) { dead = true };
 		if (health === 5) healthBar = [1, 1, 1, 1, 1];
@@ -221,7 +232,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟢 DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
+//#region DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
 
 		context.drawImage(titleImage, GameTitle.x, GameTitle.y, GameTitle.width, GameTitle.height);
 
@@ -237,7 +248,7 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟢 PAUSE MECHANICS
+//#region PAUSE MECHANICS
 
 		if (keys['p'] && !pausecheck && dead == false) { pause = !pause };
 		pausecheck = keys['p'];
@@ -250,23 +261,23 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region 🟢 KEY CHECKS, SPEED, VELOCITY AND PARACHUTE REGULATIONS
+//#region KEY CHECKS, SPEED, VELOCITY, GROUND AND PARACHUTE REGULATIONS
 
 			if (keys[' '] && onGround()) { jump(); }
 			if (Player.y == groundHeight) { Player.gravity = 0.4, parachuteDeployed = false };
 
-			if (dead == false) { var speed = keys['Control'] ? Player.speed + 1.75 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY; }
+			if (dead == false) { var speed = keys['Control'] ? Player.speed + 2 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY; }
 			else { speed = Player.speed = 0; Player.velocityY = 0; Player.gravity = 0 };
 
-			if (keys['a']) { Player.x -= speed };
-			if (keys['d']) { Player.x += speed };
+			if (keys['a']) {Chicken.x += speed, Snowtile.x += speed; groundMovement += speed};
+			if (keys['d']) { Chicken.x -= speed,  Snowtile.x -= speed, groundMovement -= speed; };
 			if (keys[' '] && !onGround() && Player.velocityY > 0) { parachute(); };
 
 			if (Player.velocityY < -17) { Player.velocityY = -17 };
 
 	//#endregion
 
-//#region 🟢 CALLING COLLISION AND BOUNDING FUNCTIONS
+//#region CALLING COLLISION AND BOUNDING FUNCTIONS
 
 			collisionDetecting(Player, Chicken);
 			boundingBox(Player);
@@ -275,30 +286,30 @@ window.addEventListener('load', function () {
 
 	//#endregion
 
-//#region 🟢 NEXT FRAME
+//#region NEXT FRAME
 
 		requestAnimationFrame(gameloop);
+	};
 
 //#endregion
 
-	};
+//#endregion🟧 GAMELOOP END
 
-//#endregion🟧
+//🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
 
 //#region 	🟨 GAMELOOP CALL
 
 	playerImage.onload = gameloop
 })
 
-//#endregion🟨
+//#endregion🟨 GAMELOOP CALL END
 	
+//🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+
 //#region 	🟩 NOTES
 
 // THINGS TO WORK ON: Screen scrolling (MOVING SCREEN AROUND THE PLAYER RATHER THAN MOVING THE WHOLE HTML DOC), enemy movement, animation, temperature bar, fixed object-based collision for ground features
 // LESS IMPORTANT: Sound design, texturing, niche/minor features
-// CURRENT THING: SCREEN SCROLL MECHANIC - MAKE THE SCREEN MOVE AROUND THE PLAYER. How to do this. Get the Player.x position and make sure the game background and ground elements can be moved around. I may need to redo / remove my background border around the game if it conflict with the movement of the main game elements. (e.g make the background border have a hole in it and move the game elements below that layer.)
+// CURRENT THING: SCREEN SCROLL MECHANIC - MAKE THE SCREEN MOVE AROUND THE PLAYER. How to do this. Get the Player.x position and make sure the game background and ground elements can be moved around.
 
-
-
-
-//#endregion🟩
+//#endregion🟩 NOTES END
