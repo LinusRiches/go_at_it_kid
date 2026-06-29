@@ -19,12 +19,12 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region TITLESCREEN (not using yet so I have replaced it with assets/null) (nullimage is just there for testing)
+//#region TITLESCREEN (not using yet so I have replaced it with assets/textures/null) (nullimage is just there for testing)
 
 	const nullImage = new Image();
-	nullImage.src = 'assets/null.png';
+	nullImage.src = 'assets/textures/null.png';
 	const titleImage = new Image();
-	titleImage.src = 'assets/null.png';
+	titleImage.src = 'assets/textures/null.png';
 	const GameTitle = { x: 450, y: 0, width: 500, height: 80 };
 
 //#endregion
@@ -37,11 +37,11 @@ window.addEventListener('load', function () {
 	const wallRight = 1224;
 		// wallRight will be like this until I figure out how it works
 	const snowtileImage = new Image();
-	snowtileImage.src = 'assets/tiles/snowtile.png';
+	snowtileImage.src = 'assets/textures/tiles/snowtile.png';
 	var Snowtile = {x: 64, y: 256, width: 64, height: 64, speed: 3};
 	Snowtile.size = 64
 	const dirttileImage = new Image();
-	dirttileImage.src = 'assets/tiles/dirttile.png';
+	dirttileImage.src = 'assets/textures/tiles/dirttile.png';
 	var groundMovement = 0;
 
 	const ground = [
@@ -64,18 +64,22 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region CHICKEN, PARACHUTE & PLAYER OBJECTS
+//#region CHICKEN, WALLOB, PARACHUTE & PLAYER OBJECTS
 
 	const chickenImage = new Image();
-	chickenImage.src = 'assets/enemies/chicken.png';
+	chickenImage.src = 'assets/textures/neutral/chicken.png';
 	const Chicken = { x: 350, y: groundHeight, width: 64, height: 64, speed: 1 };
 
+	const wallobImage = new Image();
+	wallobImage.src = 'assets/textures/enemies/wallob.png';
+	const Wallob = { x: 400, y: groundHeight - 64, width: 64, height: 128, speed: 1 };
+
 	var parachuteImage = new Image();
-	parachuteImage.src = 'assets/tools/parachute.png';
+	parachuteImage.src = 'assets/textures/tools/parachute.png';
 	var Parachute = { width: 64, height: 64 };
 
 	var playerImage = new Image();
-	playerImage.src = 'assets/goat/goatright.png';
+	playerImage.src = 'assets/textures/goat/goatright.png';
 	var Player = { x: 200, y: 150, width: 64, height: 64, speed: 3, gravity: 0.4, velocityY: 0 };
 
 //#endregion
@@ -83,9 +87,9 @@ window.addEventListener('load', function () {
 //#region HEALTH, HEALTH BAR & DEATH SCREEN VARIABLES 
 
 	const heartemptyImage = new Image();
-	heartemptyImage.src = 'assets/ui/heart_empty.png';
+	heartemptyImage.src = 'assets/textures/ui/heart_empty.png';
 	const heartfullImage = new Image();
-	heartfullImage.src = 'assets/ui/heart_full.png';
+	heartfullImage.src = 'assets/textures/ui/heart_full.png';
 	var health = 5;
 	var dead = false;
 	var deathTimer = 0;
@@ -122,10 +126,10 @@ window.addEventListener('load', function () {
 	var MusicDead = new Audio('assets/sounds/dead.wav'); MusicDead.loop = false;
 
 	const musicToggle = document.getElementById('musicbtn');
-	musicToggle.src = 'assets/ui/drum.png';
+	musicToggle.src = 'assets/textures/ui/drum.png';
 	musicToggle.width = 32; musicToggle.height = 32;
 	const soundToggle = document.getElementById('soundbtn');
-	soundToggle.src = 'assets/ui/horn.png';
+	soundToggle.src = 'assets/textures/ui/horn.png';
 	soundToggle.width = 32; musicToggle.height = 32;
 
 	musicToggle.addEventListener("click", () => { MusicChilderness.muted = !MusicChilderness.muted, MusicDead.muted = !MusicDead.muted });
@@ -144,16 +148,26 @@ window.addEventListener('load', function () {
 
 	let lastCollision = 0;
 	const CollisionCooldown = 1000;
+	let hurt = false
 
-	function collisionDetecting(Player, Chicken){
-	if (Player.x >= Chicken.x && Player.x <= Chicken.x + 48 && Player.y - 2 > Chicken.y - 2 && health > 0) { collsionSoundLog("to your left"), Player.x = Chicken.x + 48 };
-	if (Player.x >= Chicken.x - 48 && Player.x <= Chicken.x && Player.y - 2 > Chicken.y - 2 && health > 0) { collsionSoundLog("to your right"), Player.x = Chicken.x - 48; };
-	if (Player.y >= Chicken.y - 52 && Player.y <= Chicken.y + 32 && Player.x <= Chicken.x + 32 && Player.x >= Chicken.x - 32 && health) { collsionSoundLog("below"), Player.y = Chicken.y - 52, Player.velocityY = 0 };
+	function collisionDetecting(Player, Wallob){
+	if (Player.x >= Wallob.x && Player.x <= Wallob.x + 48 && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your left"), groundMovement -=  + Player.speed};
+	if (Player.x >= Wallob.x - 48 && Player.x <= Wallob.x && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your right"), groundMovement += Player.speed};
+	if (Player.y >= Wallob.y - 52 && Player.y <= Wallob.y + 32 && Player.x <= Wallob.x + 32 && Player.x >= Wallob.x - 32) { hurt = true, collsionSoundLog("below"), Player.y = Wallob.y - 52, Player.velocityY = 0 };
 	};
+
+	// function collisionDetecting(Player, Chicken){
+	// if (Player.x >= Chicken.x && Player.x <= Chicken.x + 48 && Player.y - 2 > Chicken.y - 2 && health > 0) {
+	// collsionSoundLog("to your left"), groundMovement -=  + Player.speed};
+	// if (Player.x >= Chicken.x - 48 && Player.x <= Chicken.x && Player.y - 2 > Chicken.y - 2 && health > 0) { collsionSoundLog("to your right"), groundMovement += Player.speed};
+	// if (Player.y >= Chicken.y - 52 && Player.y <= Chicken.y + 32 && Player.x <= Chicken.x + 32 && Player.x >= Chicken.x - 32) { collsionSoundLog("below"), Player.y = Chicken.y - 52, Player.velocityY = 0 };
+	// };
+
+	// this isnt working at the moment alongside the other - it makes Wallob lose the ability to do damage.
 
 	function collsionSoundLog(direction)
 	{const now = Date.now(); if (now - lastCollision >= CollisionCooldown)
-		{ console.log("colliding with enemy", direction), lastCollision = now, health -= 1;
+		{ console.log("colliding with enemy", direction), lastCollision = now; if (hurt == true) {health -= 1, hurt == false};
 			if (health > 0) {var RandomCollisionSound = [Math.floor(Math.random() * 2)]; var ChosenCollisionSound = new Audio (CollisionSounds[RandomCollisionSound]); ChosenCollisionSound.play(); }
 			else {DeathSound.play(); } }
 	};
@@ -170,21 +184,40 @@ window.addEventListener('load', function () {
 
 		// working on how to collide with the ground based on the tile below
 
-	function onGround() {
+	function onGround(Player) {
 		return Player.y >= groundHeight;
 	};
 
-	function jump() {
+	function jump(Player) {
 		{ Player.velocityY = -14 };
 	};
 
-	function parachute() {
+	function parachute(Player) {
 		Player.gravity = 0.025, parachuteDeployed = true;
 			if (!parachutecheck && keys[' ']) { SoundParachuteDeployed.play(); }
 		parachutecheck = keys[' '];
 	};
 
 //#endregion
+
+//#region ENEMY MOVEMENT
+
+let ChickenDirection = "right";
+let WallobDirection = "right";
+
+var randTimer = (Math.random() * 100)
+
+function chickenMovement(){
+	if(dead == false && pause == false){ if(ChickenDirection == "right"){Chicken.x += 1.8} if(ChickenDirection == "left"){Chicken.x -= 1.8}}};
+function chickenRandomChange(){
+	if (dead == false && pause == false){ChickenDirection = Math.random() < 0.5 ? "right" : "left"}};
+
+function wallobMovement(){
+	if(dead == false && pause == false){ if(WallobDirection == "right"){Wallob.x += 2.8} if(WallobDirection == "left"){Wallob.x -= 2.8}}};
+function wallobRandomChange(){
+	if (dead == false && pause == false){WallobDirection = Math.random() < 0.5 ? "right" : "left"}};
+
+//#endregion ENEMY MOVEMENT
 
 //#region MUSIC START FUNCTION (BUGGED)
 
@@ -228,7 +261,7 @@ function musicStart() {
 			if (health === 2) healthBar = [1, 1, 0, 0, 0];
 			if (health === 1) healthBar = [1, 0, 0, 0, 0];
 			if (health === 0) healthBar = [0, 0, 0, 0, 0];
-		}
+		};
 
 //#endregion
 
@@ -238,11 +271,13 @@ function musicStart() {
 
 		{ context.drawImage(chickenImage, Chicken.x, Chicken.y, Chicken.width, Chicken.height); Chicken.x };
 
+		{ context.drawImage(wallobImage, Wallob.x, Wallob.y, Wallob.width, Wallob.height); Wallob.x };
+
 		if (parachuteDeployed == true && dead == false) { Parachute.x = Player.x; Parachute.y = Player.y - 32, context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height); }
 
 		if (dead == false) { context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height); }
 		else {
-			playerImage.src = 'assets/goat/deadgoat.png'; context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
+			playerImage.src = 'assets/textures/goat/deadgoat.png'; context.drawImage(playerImage, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
 			if (deathTimer < 1) deathTimer += 0.001; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play();
 		};
 
@@ -263,15 +298,15 @@ function musicStart() {
 
 //#region KEY CHECKS, SPEED, VELOCITY, GROUND AND PARACHUTE REGULATIONS
 
-			if (keys[' '] && onGround()) { jump(); }
+			if (keys[' '] && onGround(Player)) { jump(Player); }
 			if (Player.y == groundHeight) { Player.gravity = 0.4, parachuteDeployed = false };
 
 			if (dead == false) { var speed = keys['Control'] ? Player.speed + 2 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY; }
 			else { speed = Player.speed = 0; Player.velocityY = 0; Player.gravity = 0 };
 
-			if (keys['a']) {Chicken.x += speed, Snowtile.x += speed; groundMovement += speed};
-			if (keys['d']) { Chicken.x -= speed,  Snowtile.x -= speed, groundMovement -= speed; };
-			if (keys[' '] && !onGround() && Player.velocityY > 0) { parachute(); };
+			if (keys['a']) { Chicken.x += speed, Wallob.x += speed, Snowtile.x += speed; groundMovement += speed };
+			if (keys['d']) { Chicken.x -= speed, Wallob.x -= speed, Snowtile.x -= speed, groundMovement -= speed; };
+			if (keys[' '] && !onGround(Player) && Player.velocityY > 0) { parachute(Player); };
 
 			if (Player.velocityY < -17) { Player.velocityY = -17 };
 
@@ -279,9 +314,15 @@ function musicStart() {
 
 //#region CALLING COLLISION AND BOUNDING FUNCTIONS
 
-			collisionDetecting(Player, Chicken);
+			randTimer -= 1;
+			if (randTimer > 0) {randTimer -= 1}
+			else if (randTimer <= 0) {randTimer = Math.random() * 100, chickenRandomChange(), wallobRandomChange()};
+
+			collisionDetecting(Player, Wallob);
+			chickenMovement();
+			wallobMovement();
 			boundingBox(Player);
-			coordtrack();
+			coordtrack(Player);
 		};
 
 	//#endregion
