@@ -297,7 +297,6 @@ function musicStart() {
 		context.imageSmoothingEnabled = false;
 		deltaTime = (currentTime - lastTime) / frameTime;
 		lastTime = currentTime;
-		var speedDelta = (speed * deltaTime);
 
 //#endregion
 
@@ -356,10 +355,7 @@ function musicStart() {
 
 		if (keys['p'] && !pausecheck && dead == false) { pause = !pause };
 		pausecheck = keys['p'];
-		if (pause == true && health > 0) { pauseScreen.textContent = "||"; const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1'); pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`); pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`); context.fillStyle = pauseScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height);
-
-
-		}
+		if (pause == true && health > 0) { pauseScreen.textContent = "||"; const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1'); pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`); pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`); context.fillStyle = pauseScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height);}
 		else if (dead == false) { pauseScreen.textContent = " " }
 		else if (dead == true) { pauseScreen.textContent = "reloading..."; pauseScreen.textContent = " "; }
 
@@ -377,6 +373,7 @@ function musicStart() {
 			else { speed = Player.speed = 0; Player.velocityY = 0; Player.gravity = 0 };
 			
 			var playerDirection = "";
+			var speedDelta = (speed * deltaTime);
 
 			if (keys['a']) { Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left";};
 			if (keys['d']) { Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right";};
