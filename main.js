@@ -76,7 +76,7 @@ window.addEventListener('load', function () {
 //#region CHICKEN, WALLOB, PARACHUTE & PLAYER OBJECTS AND CLASSES
 
 	class PlayerEntity{
-		constructor(x, y, width, height, speed, gravity, velocityY, imageSource){
+		constructor(x, y, width, height, speed, gravity, velocityY, imageObject){
 			this.x = x;
 			this.y = y;
 			this.width = width;
@@ -84,8 +84,7 @@ window.addEventListener('load', function () {
 			this.speed = speed;
 			this.gravity = gravity;
 			this.velocityY = velocityY;
-			this.image = new Image();
-			this.image.src = imageSource;
+			this.image = imageObject;
 		}
 	}
 
@@ -119,7 +118,11 @@ window.addEventListener('load', function () {
 	parachuteImage.src = 'assets/textures/tools/parachute.png';
 	var Parachute = { width: 64, height: 64 };
 
-	const Player = new PlayerEntity(200, 150, 64, 64, 3, 0.4, 0, 'assets/textures/goat/goatright.png');
+	var leftGoat = new Image(); leftGoat.src = "assets/textures/goat/leftgoat.png";
+	var rightGoat = new Image(); rightGoat.src = "assets/textures/goat/rightgoat.png";
+	var idleGoat = new Image(); idleGoat.src = "assets/textures/goat/idlegoat.png";
+	var deadGoat = new Image(); deadGoat.src = "assets/textures/goat/deadgoat.png";
+	var Player = new PlayerEntity(200, 150, 64, 64, 3, 0.4, 0, idleGoat);
 
 //#endregion
 
@@ -132,6 +135,7 @@ window.addEventListener('load', function () {
 	var health = 5;
 	var dead = false;
 	var deathTimer = 0;
+	var snowTimer = 0;
 	var healthBar = [];
 
 	function drawHealth() {
@@ -139,6 +143,15 @@ window.addEventListener('load', function () {
 			if (healthBar[bar] === 1) { context.drawImage(heartfullImage, [bar] * 48 + 16, 16, 32, 32); }
 			else { if (healthBar[bar] === 0) { context.drawImage(heartemptyImage, [bar] * 48 + 16, 16, 32, 32); } }
 	};
+
+//#region SCREEN GRADIENTS
+
+	class ScreenGradient{
+		constructor(){
+		}
+	}
+
+//#endregion
 
 //#endregion
 
@@ -180,7 +193,7 @@ window.addEventListener('load', function () {
 
 	const coordstext = document.getElementById('teststats');
 
-	function coordtrack(PlayerEntity) {
+	function coordtrack(Player) {
 		coordstext.textContent = `${Math.round(groundMovement-128)}, ${Math.round(Player.y)}`
 	};
 
@@ -192,7 +205,7 @@ window.addEventListener('load', function () {
 	const CollisionCooldown = 1000;
 	let hurt = false
 
-	function collisionDetecting(PlayerEntity, Wallob){
+	function collisionDetecting(Player, Wallob){
 	if (Player.x >= Wallob.x && Player.x <= Wallob.x + 48 && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your left"), groundMovement -=  + Player.speed};
 	if (Player.x >= Wallob.x - 48 && Player.x <= Wallob.x && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your right"), groundMovement += Player.speed};
 	if (Player.y >= Wallob.y - 52 && Player.x <= Wallob.x + 32 && Player.x >= Wallob.x - 32 && Player.y <= Wallob.y - 14) { hurt = true, collsionSoundLog("below"), Player.y = Wallob.y - 52, Player.velocityY = 0, jump(-4); };
@@ -214,7 +227,7 @@ window.addEventListener('load', function () {
 			else {DeathSound.play(); } }
 	};
 
-	function boundingBox(PlayerEntity) {
+	function boundingBox(Player) {
 		if (Player.y > groundHeight && Player.x > wallRight) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallRight }
 	else if (Player.y > groundHeight && Player.x < wallLeft) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallLeft }
 	else if (Player.y > groundHeight) { Player.y = groundHeight, Player.velocityY = 0 }
@@ -222,7 +235,7 @@ window.addEventListener('load', function () {
 	else if (Player.x > wallRight) { Player.x = wallRight }
 	};
 
-	function onGround(PlayerEntity) {
+	function onGround(Player) {
 		return Player.y >= groundHeight;
 	};
 
@@ -230,7 +243,7 @@ window.addEventListener('load', function () {
 		{ Player.velocityY = jumpheight };
 	};
 
-	function parachute(PlayerEntity) {
+	function parachute(Player) {
 		Player.gravity = 0.025, parachuteDeployed = true;
 			if (!parachutecheck && keys[' ']) { SoundParachuteDeployed.play(); }
 		parachutecheck = keys[' '];
@@ -275,17 +288,51 @@ function musicStart() {
 
 //#region GAMELOOP FUNCTION (RESETTING CANVAS)
 
-	function gameloop() {
-		context.clearRect(0, 0, gamespace.width, gamespace.height); context.imageSmoothingEnabled = false;
+	const frameTime = 1000 / 60;
+	let deltaTime = 0;
+	let lastTime = 0;
+
+	function gameloop(currentTime) {
+		context.clearRect(0, 0, gamespace.width, gamespace.height);
+		context.imageSmoothingEnabled = false;
+		deltaTime = (currentTime - lastTime) / frameTime;
+		lastTime = currentTime;
+		var speedDelta = (speed * deltaTime);
 
 //#endregion
 
-//#region DRAW GROUND & MUSIC FUNCTION CALLED, DATE.NOW
+//#region DRAW GROUND & MUSIC FUNCTION CALLED
 
 		drawGround();
 		musicStart();
 
 //#endregion
+
+//#region DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
+
+		context.drawImage(titleImage, GameTitle.x, GameTitle.y, GameTitle.width, GameTitle.height);
+
+		{ context.drawImage(Chicken.image, Chicken.x, Chicken.y, Chicken.width, Chicken.height) };
+
+		{ context.drawImage(Wallob.image, Wallob.x, Wallob.y, Wallob.width, Wallob.height) };
+
+		if (parachuteDeployed == true && dead == false) { Parachute.x = Player.x; Parachute.y = Player.y - 32, context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height); }
+
+		if (dead == false) { context.drawImage(Player.image, Player.x, Player.y, Player.width, Player.height); }
+		else {
+			Player.image = deadGoat; context.drawImage(Player.image, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
+			if (deathTimer < 1) deathTimer += 0.1; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer / 2}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play(); 
+		};
+
+//#region AFTER EFFECTS (SNOW)
+												
+		// const snowScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height);
+		// snowScreenGradient.addColorStop(0.5, `rgba(999, 999, 999, ${0.5 * snowTimer / 2}`);
+		// snowScreenGradient.addColorStop(1, `rgba(999, 999, 999, ${0.8 * snowTimer / 2}`);
+		// context.fillStyle = snowScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height)
+		// }
+
+//#endregion				
 
 //#region HEALTH DRAW AND CHECK
 	
@@ -303,34 +350,21 @@ function musicStart() {
 
 //#endregion
 
-//#region DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
-
-		context.drawImage(titleImage, GameTitle.x, GameTitle.y, GameTitle.width, GameTitle.height);
-
-		{ context.drawImage(Chicken.image, Chicken.x, Chicken.y, Chicken.width, Chicken.height) };
-
-		{ context.drawImage(Wallob.image, Wallob.x, Wallob.y, Wallob.width, Wallob.height) };
-
-		if (parachuteDeployed == true && dead == false) { Parachute.x = Player.x; Parachute.y = Player.y - 32, context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height); }
-
-		if (dead == false) { context.drawImage(Player.image, Player.x, Player.y, Player.width, Player.height); }
-		else {
-			Player.image.src = 'assets/textures/goat/deadgoat.png'; context.drawImage(Player.image, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
-			if (deathTimer < 1) deathTimer += 0.001; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play();
-		};
-
 //#endregion
 
-//#region PAUSE MECHANICS
+//#region PAUSE MECHANICS AND GAME UPDATE
 
 		if (keys['p'] && !pausecheck && dead == false) { pause = !pause };
 		pausecheck = keys['p'];
-		if (pause == true && health > 0) { pauseScreen.textContent = "||"; }
+		if (pause == true && health > 0) { pauseScreen.textContent = "||"; const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1'); pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`); pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`); context.fillStyle = pauseScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height);
+
+
+		}
 		else if (dead == false) { pauseScreen.textContent = " " }
 		else if (dead == true) { pauseScreen.textContent = "reloading..."; pauseScreen.textContent = " "; }
 
-		if (!pause) { GameUpdates(); };
-		function GameUpdates() {
+		if (!pause) { pauseUpdates(); };
+		function pauseUpdates() {
 
 //#endregion
 
@@ -341,12 +375,19 @@ function musicStart() {
 
 			if (dead == false) { var speed = keys['Control'] ? Player.speed + 2 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY; }
 			else { speed = Player.speed = 0; Player.velocityY = 0; Player.gravity = 0 };
+			
+			var playerDirection = "";
 
-			if (keys['a']) { Chicken.x += speed, Wallob.x += speed, snowtile.x += speed; groundMovement += speed };
-			if (keys['d']) { Chicken.x -= speed, Wallob.x -= speed, snowtile.x -= speed, groundMovement -= speed; };
+			if (keys['a']) { Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left";};
+			if (keys['d']) { Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right";};
 			if (keys[' '] && !onGround(Player) && Player.velocityY > 0) { parachute(Player); };
+			if (keys['s']) { playerDirection = "idle"};
 
 			if (Player.velocityY < -17) { Player.velocityY = -17 };
+
+			if (playerDirection == "left") { Player.image = leftGoat }
+			if (playerDirection == "right") { Player.image = rightGoat }
+			if (playerDirection == "idle") { Player.image = idleGoat }
 
 	//#endregion
 
@@ -357,11 +398,11 @@ function musicStart() {
 				if (randTimer > 0) {randTimer -= 1}
 				else if (randTimer <= 0) {randTimer = Math.random() * 100, chickenRandomChange(), wallobRandomChange()};
 
-			if (dead == false) {collisionDetecting(PlayerEntity, Wallob);
+			if (dead == false) {collisionDetecting(Player, Wallob);
 			chickenMovement();
 			wallobMovement();
-			boundingBox(PlayerEntity);
-			coordtrack(PlayerEntity);}
+			boundingBox(Player);
+			coordtrack(Player);}
 		};
 
 	//#endregion
