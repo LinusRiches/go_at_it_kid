@@ -5,7 +5,7 @@
 window.addEventListener('load', function () {
 
 	const gamespace = document.getElementById('gamespace');
-	gamespace.width = 5120
+	gamespace.width = 1304
 	gamespace.height = 704
 	const brick_bg = this.document.getElementById('brickborder');
 	brick_bg.width = 1436
@@ -41,10 +41,15 @@ window.addEventListener('load', function () {
 		this.image = new Image();
 		this.image.src = imageSource;
 		}
+		draw(){
+			context.fillStyle = "red"
+			context.fillRect(this.x, this.y, this.width,this.size, this.height)
+		}
 	};
 
 	var snowtile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/snowtile.png');
 	var dirttile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/dirttile.png');
+	var rockpile = new SolidBlock(64, 256, 64, 64, 64,'assets/textures/tiles/rockpile.png')
 
 	var groundMovement = 0;
 	const groundHeight = 512;
@@ -54,19 +59,30 @@ window.addEventListener('load', function () {
 	// wallRight will be like this until I figure out how it works
 
 	const ground = [
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 		[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 	];	// needs cleaning up when I fill the whole gamespace with ground, decoration and semi-solid elements.
 
+	let vars = {};
 	function drawGround() {
 		for (let row = 0; row < ground.length; row++) {
 			for (let col = 0; col < ground[row].length; col++) {
 				const tile = ground[row][col];
-				if (tile === 1) {context.drawImage(snowtile.image, groundMovement + col * snowtile.size, groundHeight - snowtile.size + row * snowtile.size, snowtile.size, snowtile.size); }
-				if (tile === 2) { context.drawImage(dirttile.image, groundMovement + col * dirttile.size, groundHeight - dirttile.size + row * dirttile.size, dirttile.size, dirttile.size); }
-				if (tile === 3) { context.drawImage(nullImage, groundMovement + col * 64, groundHeight - 64 + row * 64, 64, 64); }
+				if (tile > 0 && tile < 4) {{vars[`block${tile}`] = new SolidBlock(groundMovement + col * 64, groundHeight - 512 + row * 64, 64, 64, 64, 'assets/textures/null.png')}
+				{vars[`block${tile}`].draw()} 
+			}
+				if (tile === 1) {context.drawImage(snowtile.image, groundMovement + col * snowtile.size, groundHeight - 512 + row * snowtile.size, snowtile.size, snowtile.size); }
+				if (tile === 2) { context.drawImage(dirttile.image, groundMovement + col * dirttile.size, groundHeight - 512 + row * dirttile.size, dirttile.size, dirttile.size); }
+				if (tile === 3) { context.drawImage(rockpile.image, groundMovement + col * rockpile.size, groundHeight - 512 + row * rockpile.size, rockpile.size, rockpile.size); }
 			}
 		}
 	};
@@ -118,11 +134,11 @@ window.addEventListener('load', function () {
 	parachuteImage.src = 'assets/textures/tools/parachute.png';
 	var Parachute = { width: 64, height: 64 };
 
-	var leftGoat = new Image(); leftGoat.src = "assets/textures/goat/leftgoat.png";
-	var rightGoat = new Image(); rightGoat.src = "assets/textures/goat/rightgoat.png";
-	var idleGoat = new Image(); idleGoat.src = "assets/textures/goat/idlegoat.png";
-	var deadGoat = new Image(); deadGoat.src = "assets/textures/goat/deadgoat.png";
-	var Player = new PlayerEntity(200, 150, 64, 64, 3, 0.4, 0, idleGoat);
+
+	var goatSheet = new Image(); goatSheet.src = "assets/textures/goat/goatsheet.png";
+	var spriteFrameX = 0;
+	var spriteFrameY = 0;
+	var Player = new PlayerEntity(200, 150, 64, 64, 3, 0.4, 0, goatSheet);
 
 //#endregion
 
@@ -194,7 +210,7 @@ window.addEventListener('load', function () {
 	const coordstext = document.getElementById('teststats');
 
 	function coordtrack(Player) {
-		coordstext.textContent = `${Math.round(groundMovement-128)}, ${Math.round(Player.y)}`
+		coordstext.textContent = `GX: ${Math.round(groundMovement-128)}, PY: ${Math.round(Player.y)}`
 	};
 
 //#endregion
@@ -304,6 +320,7 @@ function musicStart() {
 
 		drawGround();
 		musicStart();
+		coordtrack(Player);
 
 //#endregion
 
@@ -317,9 +334,26 @@ function musicStart() {
 
 		if (parachuteDeployed == true && dead == false) { Parachute.x = Player.x; Parachute.y = Player.y - 32, context.drawImage(parachuteImage, Parachute.x, Parachute.y, Parachute.width, Parachute.height); }
 
-		if (dead == false) { context.drawImage(Player.image, Player.x, Player.y, Player.width, Player.height); }
-		else {
-			Player.image = deadGoat; context.drawImage(Player.image, Player.x, Player.y, Player.width, Player.height); Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
+		context.drawImage(Player.image, spriteFrameX, 0, Player.width / 4, Player.height, Player.x, Player.y, Player.width, Player.height * 4)
+
+		if (keys[' '] && onGround(Player)) { jump(-14); }
+
+		if (Player.y == groundHeight) { Player.gravity = 0.4, parachuteDeployed = false };
+
+		if (pause == false) {
+			var speed = keys['Control'] ? Player.speed + 2 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY;}
+		var playerDirection = "";
+		var speedDelta = (speed * deltaTime);
+
+		if (dead == false && pause == false) {
+			if (keys['s']) { playerDirection = "idle"; spriteFrameX = 32;};
+			if (keys['a']) { Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left"; spriteFrameX = 16;};
+			if (keys['d']) { Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right"; spriteFrameX = 0;};
+			if (keys[' '] && !onGround(Player) && Player.velocityY > 0) { parachute(Player); };
+			
+			if (Player.velocityY < -17) { Player.velocityY = -17 };}
+		else if (dead == true) {
+			spriteFrameX = 48; Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
 			if (deathTimer < 1) deathTimer += 0.1; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer / 2}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play(); 
 		};
 
@@ -355,9 +389,10 @@ function musicStart() {
 
 		if (keys['p'] && !pausecheck && dead == false) { pause = !pause };
 		pausecheck = keys['p'];
-		if (pause == true && health > 0) { pauseScreen.textContent = "||"; const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1'); pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`); pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`); context.fillStyle = pauseScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height);}
+		if (pause == true && health > 0) {
+			pauseScreen.textContent = "⏸"; const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1'); pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`); pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`); context.fillStyle = pauseScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height);}
 		else if (dead == false) { pauseScreen.textContent = " " }
-		else if (dead == true) { pauseScreen.textContent = "reloading..."; pauseScreen.textContent = " "; }
+		else if (dead == true) { pauseScreen.textContent = "reload";}
 
 		if (!pause) { pauseUpdates(); };
 		function pauseUpdates() {
@@ -366,25 +401,7 @@ function musicStart() {
 
 //#region KEY CHECKS, SPEED, VELOCITY, GROUND AND PARACHUTE REGULATIONS
 
-			if (keys[' '] && onGround(Player)) { jump(-14); }
-			if (Player.y == groundHeight) { Player.gravity = 0.4, parachuteDeployed = false };
 
-			if (dead == false) { var speed = keys['Control'] ? Player.speed + 2 : Player.speed; Player.velocityY += Player.gravity; Player.y += Player.velocityY; }
-			else { speed = Player.speed = 0; Player.velocityY = 0; Player.gravity = 0 };
-			
-			var playerDirection = "";
-			var speedDelta = (speed * deltaTime);
-
-			if (keys['a']) { Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left";};
-			if (keys['d']) { Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right";};
-			if (keys[' '] && !onGround(Player) && Player.velocityY > 0) { parachute(Player); };
-			if (keys['s']) { playerDirection = "idle"};
-
-			if (Player.velocityY < -17) { Player.velocityY = -17 };
-
-			if (playerDirection == "left") { Player.image = leftGoat }
-			if (playerDirection == "right") { Player.image = rightGoat }
-			if (playerDirection == "idle") { Player.image = idleGoat }
 
 	//#endregion
 
@@ -398,8 +415,7 @@ function musicStart() {
 			if (dead == false) {collisionDetecting(Player, Wallob);
 			chickenMovement();
 			wallobMovement();
-			boundingBox(Player);
-			coordtrack(Player);}
+			boundingBox(Player);}
 		};
 
 	//#endregion
@@ -408,6 +424,8 @@ function musicStart() {
 
 		requestAnimationFrame(gameloop);
 	};
+
+	console.log(vars);
 
 //#endregion
 
