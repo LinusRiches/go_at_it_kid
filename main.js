@@ -13,9 +13,7 @@ window.addEventListener('load', function () {
 	const context = gamespace.getContext('2d');
 	const pauseScreen = document.getElementById('pausescreen')
 	let pause = true;
-	let pausecheck = false;
-	let parachutecheck = false;
-	let parachuteDeployed = false;
+	let pausecheck, parachutecheck, parachuteDeployed = false;
 
 //#endregion
 
@@ -42,7 +40,7 @@ window.addEventListener('load', function () {
 		this.image.src = imageSource;
 		}
 		draw(){
-			context.fillStyle = "red"
+			context.fillStyle = "rgba(255, 0, 0, 0.5)"
 			context.fillRect(this.x, this.y, this.width,this.size, this.height)
 		}
 	};
@@ -58,31 +56,31 @@ window.addEventListener('load', function () {
 	const wallRight = 1224;
 	// wallRight will be like this until I figure out how it works
 
-	const ground = [
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 3, 0, 0, 0, 0, 2, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-		[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-	];	// needs cleaning up when I fill the whole gamespace with ground, decoration and semi-solid elements.
+	// needs cleaning up when I fill the whole gamespace with ground, decoration and semi-solid elements.
 
-	let vars = {};
+		let blocktypes = {};
+
+	function groundCollision(row,col,blocktypes) {
+		let blockRC = blocktypes[`snowblock${row},${col}`];
+		blocktypes[`snowblock${row},${col}`].draw();
+		if (Player.x >= blockRC.x && Player.x <= blockRC.x + blockRC.width) {}
+		if (Player.y >= blockRC.y - 64 && Player.x <= blockRC.x + 32 && Player.x >= blockRC.x - 32 && Player.y <= blockRC.y) {Player.y = blockRC.y - 64, Player.velocityY = 0}
+	};
+
 	function drawGround() {
 		for (let row = 0; row < ground.length; row++) {
 			for (let col = 0; col < ground[row].length; col++) {
 				const tile = ground[row][col];
-				if (tile > 0 && tile < 4) {{vars[`block${tile}`] = new SolidBlock(groundMovement + col * 64, groundHeight - 512 + row * 64, 64, 64, 64, 'assets/textures/null.png')}
-				{vars[`block${tile}`].draw()} 
-			}
-				if (tile === 1) {context.drawImage(snowtile.image, groundMovement + col * snowtile.size, groundHeight - 512 + row * snowtile.size, snowtile.size, snowtile.size); }
+
+				if (tile === 1) {
+					blocktypes[`snowblock${row},${col}`] = new SolidBlock(groundMovement + col * 64, groundHeight - 512 + row * 64, 64, 64, 64, 'assets/textures/null.png'); context.drawImage(snowtile.image, groundMovement + col * snowtile.size, groundHeight - 512 + row * snowtile.size, snowtile.size, snowtile.size);
+					groundCollision(row,col,blocktypes);
+				}
+
 				if (tile === 2) { context.drawImage(dirttile.image, groundMovement + col * dirttile.size, groundHeight - 512 + row * dirttile.size, dirttile.size, dirttile.size); }
-				if (tile === 3) { context.drawImage(rockpile.image, groundMovement + col * rockpile.size, groundHeight - 512 + row * rockpile.size, rockpile.size, rockpile.size); }
+
+				if (tile === 3) { context.drawImage(rockpile.image, groundMovement + col * rockpile.size, groundHeight - 512 + row * rockpile.size, rockpile.size, rockpile.size); };
+				
 			}
 		}
 	};
@@ -256,11 +254,11 @@ window.addEventListener('load', function () {
 	};
 
 	function boundingBox(Player) {
-		if (Player.y > groundHeight && Player.x > wallRight) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallRight }
-	else if (Player.y > groundHeight && Player.x < wallLeft) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallLeft }
-	else if (Player.y > groundHeight) { Player.y = groundHeight, Player.velocityY = 0 }
-	else if (Player.x < wallLeft) { Player.x = wallLeft }
-	else if (Player.x > wallRight) { Player.x = wallRight }
+		// if (Player.y > groundHeight && Player.x > wallRight) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallRight }
+		// else if (Player.y > groundHeight && Player.x < wallLeft) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallLeft }
+		// else if (Player.y > groundHeight) { Player.y = groundHeight, Player.velocityY = 0 }
+		// else if (Player.x < wallLeft) { Player.x = wallLeft }
+		// else if (Player.x > wallRight) { Player.x = wallRight }
 	};
 
 	function onGround(Player) {
@@ -273,7 +271,7 @@ window.addEventListener('load', function () {
 
 	function parachute(Player) {
 		Player.gravity = 0.025, parachuteDeployed = true;
-			if (!parachutecheck && keys[' ']) { SoundParachuteDeployed.play(); }
+		if (!parachutecheck && keys[' ']) { SoundParachuteDeployed.play(); }
 		parachutecheck = keys[' '];
 	};
 
@@ -331,7 +329,6 @@ function musicStart() {
 //#region DRAW GROUND & MUSIC FUNCTION CALLED
 
 		drawGround();
-		musicStart();
 		coordtrack(Player);
 
 //#endregion
@@ -359,7 +356,7 @@ function musicStart() {
 		var playerDirection = "";
 		var speedDelta = (speed * deltaTime);
 
-		if (dead == false && pause == false) {
+		if (dead == false && pause == false) {musicStart();
 			if (keys['s']) { playerDirection = "idle"; spriteFrameX = 32;};
 			if (keys['a']) { Shop.x += speedDelta, Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left"; spriteFrameX = 16;};
 			if (keys['d']) { Shop.x -= speedDelta, Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right"; spriteFrameX = 0;};
@@ -438,7 +435,7 @@ function musicStart() {
 		requestAnimationFrame(gameloop);
 	};
 
-	console.log(vars);
+	console.log(blocktypes);
 
 //#endregion
 
