@@ -1,17 +1,20 @@
 //#region 	🟥 MAIN VARIABLES, CONSTANTS AND FUNCTIONS
 
-//#region INITIAL LOAD, CANVAS, PAUSE & BACKGROUND CONSTANTS & DIMENSIONS
+	//#region Initial load, gamespace creation
 
-window.addEventListener('load', function () {
+	window.addEventListener('load', function () {
 
 	const gamespace = document.getElementById('gamespace');
-	gamespace.width = 1304
-	gamespace.height = 704
 	const brick_bg = this.document.getElementById('brickborder');
-	brick_bg.width = 1436
-	brick_bg.height = 770
 	const context = gamespace.getContext('2d');
 	const pauseScreen = document.getElementById('pausescreen')
+	const coordstext = document.getElementById('teststats');
+
+	gamespace.width = 1304
+	gamespace.height = 704
+	brick_bg.width = 1436
+	brick_bg.height = 770
+
 	let pause = true;
 	let pausecheck, parachutecheck, parachuteDeployed = false;
 
@@ -21,13 +24,11 @@ window.addEventListener('load', function () {
 	titleImage.src = 'assets/textures/null.png';
 	const GameTitle = { x: 450, y: 0, width: 500, height: 80 };
 
-	const coordstext = document.getElementById('teststats');
-
 	const keys = {};
 
-//#endregion
+	//#endregion
 
-//#region CLASSES
+	//#region Classes
 
 	class SolidBlock{
 		constructor(x, y, height, width, size, imageSource){
@@ -38,7 +39,7 @@ window.addEventListener('load', function () {
 			this.size = size;
 			this.image = new Image();
 			this.image.src = imageSource;}
-		redBlockDraw(){context.fillStyle = "rgba(255, 8, 8, 0.5)"; context.fillRect(this.x+4, this.y+4, this.width-8, this.height - 8, this.size,) } };
+		drawRedOverlay(){context.fillStyle = "rgba(255, 8, 8, 0.5)"; context.fillRect(this.x+4, this.y+4, this.width-8, this.height - 8, this.size,) } };
 
 	class PlayerEntity{
 		constructor(x, y, width, height, speed, gravity, velocityY, imageObject){
@@ -78,6 +79,10 @@ window.addEventListener('load', function () {
 			this.image = new Image();
 			this.image.src = imageSource; } };
 
+	//#endregion
+
+	//#region Variables
+
 	var snowtile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/snowtile.png');
 	var dirttile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/dirttile.png');
 	var rockpile = new SolidBlock(64, 256, 64, 64, 64,'assets/textures/tiles/rockpile.png')
@@ -107,9 +112,11 @@ window.addEventListener('load', function () {
 	var snowTimer = 0;
 	var healthBar = [];
 
-//#endregion
-
-//#region MUSIC & SOUND FUNCTIONS (INCLUDING BUTTONS)
+	const drumImage = new Image();
+	drumImage.src = "assets/textures/ui/drum.png";
+	const hornImage = new Image();
+	hornImage.src = "assets/textures/ui/horn.png";
+	const userInterface = [];
 
 	var CollisionSounds = [('assets/sounds/hurt.wav'), ('assets/sounds/hurt2.wav')];
 	var DeathSound = new Audio('assets/sounds/death.wav');
@@ -118,18 +125,9 @@ window.addEventListener('load', function () {
 	var MusicDead = new Audio('assets/sounds/dead.wav'); MusicDead.loop = false;
 
 	const musicToggle = document.getElementById('musicbtn');
-	musicToggle.src = 'assets/textures/ui/drum.png';
-	musicToggle.width = 32; musicToggle.height = 32;
+	musicToggle.width = 48; musicToggle.height = 48;
 	const soundToggle = document.getElementById('soundbtn');
-	soundToggle.src = 'assets/textures/ui/horn.png';
-	soundToggle.width = 32; musicToggle.height = 32;
-
-	musicToggle.addEventListener("click", () => { MusicChilderness.muted = !MusicChilderness.muted, MusicDead.muted = !MusicDead.muted });
-	soundToggle.addEventListener("click", () => { ChosenCollisionSound.muted = !ChosenCollisionSound.muted, SoundParachuteDeployed.muted = !SoundParachuteDeployed.muted });
-
-//#endregion
-
-//#region Collision timers and health
+	soundToggle.width = 48; soundToggle.height = 48;
 
 	let lastCollision = 0;
 	const CollisionCooldown = 1000;
@@ -139,9 +137,9 @@ window.addEventListener('load', function () {
 	let WallobDirection = "right";
 	var randTimer = (Math.random() * 100)
 
-//#endregion
+	//#endregion
 
-//#region FUNCTIONS (GENERAL, PLAYER, ENEMY, UI AND CONTROLS)
+//#region Functions (General, player, enemy, UI and controls)
 
 	function pauseUpdates() {
 		randTimer -= 1;
@@ -164,10 +162,10 @@ window.addEventListener('load', function () {
 
 	function groundCollision(row,col,blocktypes) {
 		let blockRC = blocktypes[`snowblock${row},${col}`];
-		blocktypes[`snowblock${row},${col}`].redBlockDraw();
+		blocktypes[`snowblock${row},${col}`].drawRedOverlay();
 		if (Player.x >= blockRC.x && Player.x <= blockRC.x + blockRC.width) {}
 		if (Player.y >= blockRC.y - 64 && Player.x <= blockRC.x + 32 && Player.x >= blockRC.x - 32 && Player.y <= blockRC.y) {Player.y = blockRC.y - 64, Player.velocityY = 0} };
-		// Currently is allowing the player to jump through and snap onto the block. It also does not turn onGround to true due to the code below: (It just counts the ground as a horizontal line for now)
+			// Currently is allowing the player to jump through and snap onto the block. It also does not turn onGround to true due to the code below: (It just counts the ground as a horizontal line for now)
 
 	function onGround(Player) {
 		return Player.y >= groundHeight; };
@@ -180,9 +178,9 @@ window.addEventListener('load', function () {
 		if (!parachutecheck && keys[' ']) {SoundParachuteDeployed.play();}
 		parachutecheck = keys[' ']; };
 
-	// ENEMIES (and interactions with the player)
+		// Enemies (and interactions with the player)
 
-	// I will condense these 4 into 2 or 1 when I figure out a better way of making movement.
+		// I will condense these 4 into 2 or 1 when I figure out a better way of making movement.
 	function chickenMovement(){
 		if (dead == false && pause == false) {if(ChickenDirection == "right") {Chicken.x += 1.8} if(ChickenDirection == "left") {Chicken.x -= 1.8} } };
 	function chickenRandomChange(){
@@ -207,14 +205,31 @@ window.addEventListener('load', function () {
 		if (Player.y >= Wallob.y - 52 && Player.x <= Wallob.x + 32 && Player.x >= Wallob.x - 32 && Player.y <= Wallob.y - 14) { hurt = true, collsionSoundLog("below"), Player.y = Wallob.y - 52, Player.velocityY = 0, jump(-4); };
 		if (Player.y > 700) {health = 0}; };
 
-// UI AND CONTROLS
+			// UI and controls
+
+	function setHealthBar() {
+		if (health > 0) { dead = false } else if (health <= 0) { dead = true };
+		if (health === 5) {healthBar = [1, 1, 1, 1, 1];}
+		else {
+			if (health === 4) healthBar = [1, 1, 1, 1, 0];
+			if (health === 3) healthBar = [1, 1, 1, 0, 0];
+			if (health === 2) healthBar = [1, 1, 0, 0, 0];
+			if (health === 1) healthBar = [1, 0, 0, 0, 0];
+			if (health === 0) healthBar = [0, 0, 0, 0, 0]; }; };
 	
 	function drawHealth() {
 		for (let heart = 0; heart < healthBar.length; heart++)
-			if (healthBar[heart] === 1) { context.drawImage(heartfullImage, [heart] * 48 + 16, 16, 32, 32); }
-			else { if (healthBar[heart] === 0) { context.drawImage(heartemptyImage, [heart] * 48 + 16, 16, 32, 32); } } };
+			if (healthBar[heart] === 1) { context.drawImage(heartfullImage, [heart] * 64 + 16, 16, 48, 48); }
+			else { if (healthBar[heart] === 0) { context.drawImage(heartemptyImage, [heart] * 64 + 16, 16, 48, 48); } } };
+
+	function drawButtons() {
+		context.drawImage(drumImage, 1234, 16, 48, 48);
+		context.drawImage(hornImage, 1170, 16, 48, 48); };
 
 	function coordTrack(Player) {coordstext.textContent = `GX: ${Math.round(groundMovement-128)}, PY: ${Math.round(Player.y)}` };
+
+	musicToggle.addEventListener("click", () => { MusicChilderness.muted = !MusicChilderness.muted, MusicDead.muted = !MusicDead.muted });
+	soundToggle.addEventListener("click", () => { SoundParachuteDeployed.muted = !SoundParachuteDeployed.muted, DeathSound.muted = !DeathSound.muted, CollisionSounds.muted = !CollisionSounds.muted} );
 
 	function musicStart() {
 		const now = Date.now();
@@ -222,21 +237,17 @@ window.addEventListener('load', function () {
 		let musicCooldown = 1000;
 		if (now - lastMusic >= musicCooldown) {MusicChilderness.play(); }; };
 
-	window.addEventListener('keydown', function (e) {
-		keys[e.key] = true; const runDirection = ["a", "d"];
-		if (runDirection.includes(e.key) || e.ctrlKey) {e.preventDefault();} } );
-		//doesnt stop ctrl+W but does other combinations
-	window.addEventListener('keyup', function (e) {keys[e.key] = false;} );
+	window.addEventListener('keydown', function (pressed) {
+		keys[pressed.key] = true; const runDirection = ["a", "d"];
+		if (runDirection.includes(pressed.key) || pressed.ctrlKey) {pressed.preventDefault(); } } );
+		// doesnt stop ctrl+W but does other combinations
+	window.addEventListener('keyup', function (pressed) {keys[pressed.key] = false;} );
 
-//#endregion FUNCTIONS (GENERAL, PLAYER, ENEMY, UI AND CONTROLS)
+//#endregion
 
 //#endregion🟥 MAIN VARIABLES, CONSTANTS AND FUNCTIONS
 
-//🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
-
-//#region	🟧 GAMELOOP
-
-//#region GAMELOOP FUNCTION (RESETTING CANVAS)
+//#region	🟧 Gameloop
 
 	const frameTime = 1000 / 60;
 	let deltaTime = 0;
@@ -248,16 +259,12 @@ window.addEventListener('load', function () {
 		deltaTime = (currentTime - lastTime) / frameTime;
 		lastTime = currentTime;
 
-//#endregion
-
-//#region DRAW GROUND & MUSIC FUNCTION CALLED
-
-		drawGround();
 		coordTrack(Player);
+		setHealthBar();
 
-//#endregion
-
-//#region DRAW OBJECTS (CHICKEN, PARACHUTE, PLAYER (INCLUDING DEAD SPRITE AND DEATH SCREEN), TITLE)
+		drawHealth();
+		drawGround();
+		drawButtons();
 
 		context.drawImage(Shop.image, Shop.x, Shop.y, Shop.width, Shop.height);
 
@@ -272,6 +279,7 @@ window.addEventListener('load', function () {
 		context.drawImage(Player.image, spriteFrameX, 0, Player.width / 4, Player.height, Player.x, Player.y, Player.width, Player.height * 4)
 
 		if (keys[' '] && onGround(Player)) { jump(-14); }
+		//not sure why I haven't put this all in a function but okay
 
 		if (Player.y == groundHeight) { Player.gravity = 0.4, parachuteDeployed = false };
 
@@ -280,18 +288,25 @@ window.addEventListener('load', function () {
 		var playerDirection = "";
 		var speedDelta = (speed * deltaTime);
 
-		if (dead == false && pause == false) {musicStart();
-			if (keys['s']) { playerDirection = "idle"; spriteFrameX = 32;};
-			if (keys['a']) { Shop.x += speedDelta, Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left"; spriteFrameX = 16;};
-			if (keys['d']) { Shop.x -= speedDelta, Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right"; spriteFrameX = 0;};
+		if (dead == false && pause == false) {
+			musicStart();
+			if (keys['s']) { playerDirection = "idle"; spriteFrameX = 32; };
+			if (keys['a']) { Shop.x += speedDelta, Chicken.x += speedDelta, Wallob.x += speedDelta, groundMovement += speedDelta; playerDirection = "left"; spriteFrameX = 16 };
+			if (keys['d']) { Shop.x -= speedDelta, Chicken.x -= speedDelta, Wallob.x -= speedDelta, snowtile.x -= speedDelta, groundMovement -= speedDelta, playerDirection = "right"; spriteFrameX = 0; };
 			if (keys[' '] && !onGround(Player) && Player.velocityY > 0) { parachute(Player); };
-			if (Player.velocityY < -17) { Player.velocityY = -17 };}
+			if (Player.velocityY < -17) { Player.velocityY = -17 }; }
 		else if (dead == true) {
 			spriteFrameX = 48; Player.speed = 0; Player.gravity = 0; Player.velocityY = 0;
-			if (deathTimer < 1) deathTimer += 0.1; const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0'); deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer / 2}`); deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`); context.fillStyle = deathScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true }; MusicDead.play(); 
-		};
+			if (deathTimer < 1) {deathTimer += 0.05; };
+			const deathScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height);
+			deathScreenGradient.addColorStop(0, 'rgba(255, 0, 0, 0');
+			deathScreenGradient.addColorStop(0.8, `rgba(255, 0, 0, ${0.1 * deathTimer / 2}`);
+			deathScreenGradient.addColorStop(1, `rgba(255, 0, 0, ${0.7 * deathTimer}`);
+			context.fillStyle = deathScreenGradient;
+			context.fillRect(0, 0, gamespace.width, gamespace.height); const deathScreen = document.getElementById('deathscreen'); deathScreen.textContent = "YOU DIED"; { MusicChilderness.muted = true };
+			MusicDead.play(); };
 
-//#region AFTER EFFECTS (SNOW)
+	//#region AFTER EFFECTS (SNOW)
 												
 		// const snowScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height);
 		// snowScreenGradient.addColorStop(0.5, `rgba(999, 999, 999, ${0.5 * snowTimer / 2}`);
@@ -299,65 +314,38 @@ window.addEventListener('load', function () {
 		// context.fillStyle = snowScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height)
 		// }
 
-//#endregion				
+	//#endregion
 
-//#region HEALTH DRAW AND CHECK
-	
-		drawHealth();
-
-		if (health > 0) { dead = false } else if (health <= 0) { dead = true };
-		if (health === 5) healthBar = [1, 1, 1, 1, 1];
-		else {
-			if (health === 4) healthBar = [1, 1, 1, 1, 0];
-			if (health === 3) healthBar = [1, 1, 1, 0, 0];
-			if (health === 2) healthBar = [1, 1, 0, 0, 0];
-			if (health === 1) healthBar = [1, 0, 0, 0, 0];
-			if (health === 0) healthBar = [0, 0, 0, 0, 0];
-		};
-
-//#endregion
-
-//#endregion
-
-//#region PAUSE MECHANICS AND GAME UPDATE
+	//#region Pause mechanics and gameloop condition
 
 		if (keys['p'] && !pausecheck && dead == false) { pause = !pause };
 		pausecheck = keys['p'];
 		if (pause == true && health > 0) {
-			pauseScreen.textContent = "⏸"; const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height); pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1'); pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`); pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`); context.fillStyle = pauseScreenGradient; context.fillRect(0, 0, gamespace.width, gamespace.height);}
+			pauseScreen.textContent = "⏸";
+			const pauseScreenGradient = context.createLinearGradient(0, 0, 0, gamespace.height);
+			pauseScreenGradient.addColorStop(0, 'rgba(0, 0, 0, 0.1');
+			pauseScreenGradient.addColorStop(0.8, `rgba(0, 0, 0, 0.2`);
+			pauseScreenGradient.addColorStop(1, `rgba(0, 0, 0, 0.5`);
+			context.fillStyle = pauseScreenGradient;
+			context.fillRect(0, 0, gamespace.width, gamespace.height); }
 		else if (dead == false) { pauseScreen.textContent = " " }
 		else if (dead == true) { pauseScreen.textContent = "reload";}
-
 		if (!pause) { pauseUpdates(); };
 
-	//#endregion
-
-//#region NEXT FRAME
-
-		requestAnimationFrame(gameloop);
-	};
+		requestAnimationFrame(gameloop); };
 
 	console.log(blocktypes);
 
-//#endregion
-
-//#endregion🟧 GAMELOOP END
-
-//🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
-
-//#region 	🟨 GAMELOOP CALL
-
-	Player.image.onload = gameloop
-})
-
-//#endregion🟨 GAMELOOP CALL END
+	Player.image.onload = gameloop; } )
 	
-//🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
+	//#endregion Pause mechanics and gameloop condition end
 
-//#region 	🟩 NOTES
+//#endregion	🟧 Gameloop end
+
+//#region 	🟩 Notes
 
 // THINGS TO WORK ON: Screen scrolling (MOVING SCREEN AROUND THE PLAYER RATHER THAN MOVING THE WHOLE HTML DOC), enemy movement, animation, temperature bar, fixed object-based collision for ground features
 // LESS IMPORTANT: Sound design, texturing, niche/minor features
-// CURRENT THING: solid ground, onground fix to blocks themselves not a level of gorund
+// CURRENT THING: solid ground, onground fix to blocks themselves not a level of ground. Stop doing unimportant things though they are much more fun <o_o>
 
-//#endregion🟩 NOTES END
+//#endregion🟩 Notes end

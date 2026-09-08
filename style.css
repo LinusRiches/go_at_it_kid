@@ -19,10 +19,11 @@
 #gamespace {
   position: absolute;
   image-rendering: pixelated;
-  transform: translate(-50%, -50%);
+  transform: translate(-50.05%, -50%);
   top: 50%;
   left: 50%;
   background-image: url('assets/textures/backgrounds/background.png');
+  background-size: 1300px, 700px;
   z-index: 1;
   background-repeat:no-repeat;
 }
@@ -48,17 +49,15 @@
 #musicbtn {
   z-index: 4;
   position: absolute;
-  image-rendering: pixelated;
-  top: 6%;
-  left: 88%;
+  top: 48px;
+  left: 1297.5px;
 }
 
 #soundbtn {
   z-index: 4;
   position: absolute;
-  image-rendering: pixelated;
-  top: 6%;
-  left: 91%;
+  top: 48px;
+  left: 1233.5px;
 }
 
 #teststats {
