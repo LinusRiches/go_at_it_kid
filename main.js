@@ -1,4 +1,4 @@
-//#region 	🟥 MAIN VARIABLES AND CONSTANTS
+//#region 	🟥 MAIN VARIABLES, CONSTANTS AND FUNCTIONS
 
 //#region INITIAL LOAD, CANVAS, PAUSE & BACKGROUND CONSTANTS & DIMENSIONS
 
@@ -15,79 +15,30 @@ window.addEventListener('load', function () {
 	let pause = true;
 	let pausecheck, parachutecheck, parachuteDeployed = false;
 
-//#endregion
-
-//#region TITLESCREEN (not using yet so I have replaced it with assets/textures/null) (nullimage is just there for testing)
-
 	const nullImage = new Image();
 	nullImage.src = 'assets/textures/null.png';
 	const titleImage = new Image();
 	titleImage.src = 'assets/textures/null.png';
 	const GameTitle = { x: 450, y: 0, width: 500, height: 80 };
 
+	const coordstext = document.getElementById('teststats');
+
+	const keys = {};
+
 //#endregion
 
-//#region GROUND DIMENSIONS & DRAWING / CLASSES (function is looking through each row, mapping the tile texture to each corresponding integer)
+//#region CLASSES
 
 	class SolidBlock{
 		constructor(x, y, height, width, size, imageSource){
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.size = size;
-		this.image = new Image();
-		this.image.src = imageSource;
-		}
-		draw(){
-			context.fillStyle = "rgba(255, 0, 0, 0.5)"
-			context.fillRect(this.x, this.y, this.width,this.size, this.height)
-		}
-	};
-
-	var snowtile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/snowtile.png');
-	var dirttile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/dirttile.png');
-	var rockpile = new SolidBlock(64, 256, 64, 64, 64,'assets/textures/tiles/rockpile.png')
-
-	var groundMovement = 0;
-	const groundHeight = 512;
-	const ceilingHeight = -5;
-	const wallLeft = -8;
-	const wallRight = 1224;
-	// wallRight will be like this until I figure out how it works
-
-	// needs cleaning up when I fill the whole gamespace with ground, decoration and semi-solid elements.
-
-		let blocktypes = {};
-
-	function groundCollision(row,col,blocktypes) {
-		let blockRC = blocktypes[`snowblock${row},${col}`];
-		blocktypes[`snowblock${row},${col}`].draw();
-		if (Player.x >= blockRC.x && Player.x <= blockRC.x + blockRC.width) {}
-		if (Player.y >= blockRC.y - 64 && Player.x <= blockRC.x + 32 && Player.x >= blockRC.x - 32 && Player.y <= blockRC.y) {Player.y = blockRC.y - 64, Player.velocityY = 0}
-	};
-
-	function drawGround() {
-		for (let row = 0; row < ground.length; row++) {
-			for (let col = 0; col < ground[row].length; col++) {
-				const tile = ground[row][col];
-
-				if (tile === 1) {
-					blocktypes[`snowblock${row},${col}`] = new SolidBlock(groundMovement + col * 64, groundHeight - 512 + row * 64, 64, 64, 64, 'assets/textures/null.png'); context.drawImage(snowtile.image, groundMovement + col * snowtile.size, groundHeight - 512 + row * snowtile.size, snowtile.size, snowtile.size);
-					groundCollision(row,col,blocktypes);
-				}
-
-				if (tile === 2) { context.drawImage(dirttile.image, groundMovement + col * dirttile.size, groundHeight - 512 + row * dirttile.size, dirttile.size, dirttile.size); }
-
-				if (tile === 3) { context.drawImage(rockpile.image, groundMovement + col * rockpile.size, groundHeight - 512 + row * rockpile.size, rockpile.size, rockpile.size); };
-				
-			}
-		}
-	};
-
-//#endregion
-
-//#region CHICKEN, WALLOB, PARACHUTE & PLAYER OBJECTS AND CLASSES
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.size = size;
+			this.image = new Image();
+			this.image.src = imageSource;}
+		redBlockDraw(){context.fillStyle = "rgba(255, 8, 8, 0.5)"; context.fillRect(this.x+4, this.y+4, this.width-8, this.height - 8, this.size,) } };
 
 	class PlayerEntity{
 		constructor(x, y, width, height, speed, gravity, velocityY, imageObject){
@@ -98,9 +49,7 @@ window.addEventListener('load', function () {
 			this.speed = speed;
 			this.gravity = gravity;
 			this.velocityY = velocityY;
-			this.image = imageObject;
-		}
-	}
+			this.image = imageObject; } };
 
 	class EnemyEntity{
 		constructor(x, y, width, height, imageSource){
@@ -109,9 +58,7 @@ window.addEventListener('load', function () {
 			this.width = width;
 			this.height = height;
 			this.image = new Image();
-			this.image.src = imageSource;
-		}
-	}
+			this.image.src = imageSource; } };
 
 	class NeutralEntity{
 		constructor(x, y, width, height, imageSource){
@@ -120,9 +67,7 @@ window.addEventListener('load', function () {
 			this.width = width;
 			this.height = height;
 			this.image = new Image();
-			this.image.src = imageSource;
-		}
-	};
+			this.image.src = imageSource; } };
 
 	class Structure{
 		constructor(x, y, width, height, imageSource){
@@ -131,28 +76,26 @@ window.addEventListener('load', function () {
 			this.width = width;
 			this.height = height;
 			this.image = new Image();
-			this.image.src = imageSource;
-		}
-	};
+			this.image.src = imageSource; } };
+
+	var snowtile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/snowtile.png');
+	var dirttile = new SolidBlock(64, 256, 64, 64, 64, 'assets/textures/tiles/dirttile.png');
+	var rockpile = new SolidBlock(64, 256, 64, 64, 64,'assets/textures/tiles/rockpile.png')
+	var groundMovement = 0;
+	const groundHeight = 512;
+	const ceilingHeight = -5;
+	let blocktypes = {};
 
 	const Shop = new Structure(920, groundHeight - 256, 320, 320, "assets/textures/structures/shop.png");
-
 	const Chicken = new NeutralEntity(350, groundHeight, 64, 64, 'assets/textures/neutral/chicken.png');
-
 	const Wallob = new EnemyEntity(400, groundHeight - 64, 64, 128,'assets/textures/enemies/wallob.png');
 
-	var parachuteImage = new Image();
-	parachuteImage.src = 'assets/textures/tools/parachute.png';
+	var parachuteImage = new Image(); parachuteImage.src = 'assets/textures/tools/parachute.png';
 	var Parachute = { width: 64, height: 64 };
-
 	var goatSheet = new Image(); goatSheet.src = "assets/textures/goat/goatsheet.png";
 	var spriteFrameX = 0;
 	var spriteFrameY = 0;
 	var Player = new PlayerEntity(200, 150, 64, 64, 3, 0.4, 0, goatSheet);
-
-//#endregion
-
-//#region HEALTH, HEALTH BAR & DEATH SCREEN VARIABLES 
 
 	const heartemptyImage = new Image();
 	heartemptyImage.src = 'assets/textures/ui/heart_empty.png';
@@ -163,35 +106,6 @@ window.addEventListener('load', function () {
 	var deathTimer = 0;
 	var snowTimer = 0;
 	var healthBar = [];
-
-	function drawHealth() {
-		for (let bar = 0; bar < healthBar.length; bar++)
-			if (healthBar[bar] === 1) { context.drawImage(heartfullImage, [bar] * 48 + 16, 16, 32, 32); }
-			else { if (healthBar[bar] === 0) { context.drawImage(heartemptyImage, [bar] * 48 + 16, 16, 32, 32); } }
-	};
-
-//#region SCREEN GRADIENTS
-
-	class ScreenGradient{
-		constructor(){
-		}
-	}
-
-//#endregion
-
-//#endregion
-
-//#region RUN DIRECTION KEY EVENT LISTENERS
-
-	const keys = {};
-
-	window.addEventListener('keydown', function (e) {
-		keys[e.key] = true;
-		const runDirection = ["a", "d"];
-		if (runDirection.includes(e.key) || e.ctrlKey) { e.preventDefault(); }
-	});
-		//doesnt stop ctrl+W but does other combinations
-	window.addEventListener('keyup', function (e) { keys[e.key] = false; });
 
 //#endregion
 
@@ -215,98 +129,108 @@ window.addEventListener('load', function () {
 
 //#endregion
 
-//#region COORDINATE TRACKER
-
-	const coordstext = document.getElementById('teststats');
-
-	function coordtrack(Player) {
-		coordstext.textContent = `GX: ${Math.round(groundMovement-128)}, PY: ${Math.round(Player.y)}`
-	};
-
-//#endregion
-
-//#region COLLISION, BOUNDING, ONGROUND, JUMP & PARACHUTE FUNCTIONS
+//#region Collision timers and health
 
 	let lastCollision = 0;
 	const CollisionCooldown = 1000;
 	let hurt = false
 
-	function collisionDetecting(Player, Wallob){
-	if (Player.x >= Wallob.x && Player.x <= Wallob.x + 48 && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your left")};
-	if (Player.x >= Wallob.x - 48 && Player.x <= Wallob.x && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your right")};
-	if (Player.y >= Wallob.y - 52 && Player.x <= Wallob.x + 32 && Player.x >= Wallob.x - 32 && Player.y <= Wallob.y - 14) { hurt = true, collsionSoundLog("below"), Player.y = Wallob.y - 52, Player.velocityY = 0, jump(-4); };
-	};
+	let ChickenDirection = "right";
+	let WallobDirection = "right";
+	var randTimer = (Math.random() * 100)
 
-	// function collisionDetecting(Player, Chicken){
-	// if (Player.x >= Chicken.x && Player.x <= Chicken.x + 48 && Player.y - 2 > Chicken.y - 2 && health > 0) {
-	// collsionSoundLog("to your left"), groundMovement -=  + Player.speed};
-	// if (Player.x >= Chicken.x - 48 && Player.x <= Chicken.x && Player.y - 2 > Chicken.y - 2 && health > 0) { collsionSoundLog("to your right"), groundMovement += Player.speed};
-	// if (Player.y >= Chicken.y - 52 && Player.y <= Chicken.y + 32 && Player.x <= Chicken.x + 32 && Player.x >= Chicken.x - 32) { collsionSoundLog("below"), Player.y = Chicken.y - 52, Player.velocityY = 0 };
-	// };
+//#endregion
 
-	// this isnt working at the moment alongside the other - it removes the ability for either to do damage.
+//#region FUNCTIONS (GENERAL, PLAYER, ENEMY, UI AND CONTROLS)
 
-	function collsionSoundLog(direction)
-	{const now = Date.now(); if (now - lastCollision >= CollisionCooldown)
-		{ console.log("colliding with enemy", direction), lastCollision = now; if (hurt == true) {health -= 1, hurt == false};
-			if (health > 0) {var RandomCollisionSound = [Math.floor(Math.random() * 2)]; var ChosenCollisionSound = new Audio (CollisionSounds[RandomCollisionSound]); ChosenCollisionSound.play(); }
-			else {DeathSound.play(); } }
-	};
+	function pauseUpdates() {
+		randTimer -= 1;
+		if (randTimer > 0) {randTimer -= 1}
+		else if (randTimer <= 0) {randTimer = Math.random() * 100, chickenRandomChange(), wallobRandomChange()};
+		if (dead == false) {collisionDetecting(Player, Wallob); chickenMovement(); wallobMovement(); } };
 
-	function boundingBox(Player) {
-		// if (Player.y > groundHeight && Player.x > wallRight) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallRight }
-		// else if (Player.y > groundHeight && Player.x < wallLeft) { Player.y = groundHeight, Player.velocityY = 0, Player.x = wallLeft }
-		// else if (Player.y > groundHeight) { Player.y = groundHeight, Player.velocityY = 0 }
-		// else if (Player.x < wallLeft) { Player.x = wallLeft }
-		// else if (Player.x > wallRight) { Player.x = wallRight }
-	};
+	function drawGround() {
+		for (let row = 0; row < ground.length; row++) {
+			for (let col = 0; col < ground[row].length; col++) {
+			
+				const tile = ground[row][col];
+
+				if (tile === 1) { blocktypes[`snowblock${row},${col}`] = new SolidBlock(groundMovement + col * 64, groundHeight - 512 + row * 64, 64, 64, 64, 'assets/textures/null.png'); context.drawImage(snowtile.image, groundMovement + col * snowtile.size, groundHeight - 512 + row * snowtile.size, snowtile.size, snowtile.size); groundCollision(row,col,blocktypes); }
+
+				if (tile === 2) { context.drawImage(dirttile.image, groundMovement + col * dirttile.size, groundHeight - 512 + row * dirttile.size, dirttile.size, dirttile.size); }
+
+				if (tile === 3) { context.drawImage(rockpile.image, groundMovement + col * rockpile.size, groundHeight - 512 + row * rockpile.size, rockpile.size, rockpile.size); }; } } };
+				//(function is looking through each row, mapping the tile texture to each corresponding integer)
+
+	function groundCollision(row,col,blocktypes) {
+		let blockRC = blocktypes[`snowblock${row},${col}`];
+		blocktypes[`snowblock${row},${col}`].redBlockDraw();
+		if (Player.x >= blockRC.x && Player.x <= blockRC.x + blockRC.width) {}
+		if (Player.y >= blockRC.y - 64 && Player.x <= blockRC.x + 32 && Player.x >= blockRC.x - 32 && Player.y <= blockRC.y) {Player.y = blockRC.y - 64, Player.velocityY = 0} };
+		// Currently is allowing the player to jump through and snap onto the block. It also does not turn onGround to true due to the code below: (It just counts the ground as a horizontal line for now)
 
 	function onGround(Player) {
-		return Player.y >= groundHeight;
-	};
+		return Player.y >= groundHeight; };
 
 	function jump(jumpheight) {
-		{ Player.velocityY = jumpheight };
-	};
+		{ Player.velocityY = jumpheight }; };
 
 	function parachute(Player) {
 		Player.gravity = 0.025, parachuteDeployed = true;
-		if (!parachutecheck && keys[' ']) { SoundParachuteDeployed.play(); }
-		parachutecheck = keys[' '];
-	};
+		if (!parachutecheck && keys[' ']) {SoundParachuteDeployed.play();}
+		parachutecheck = keys[' ']; };
 
-//#endregion
+	// ENEMIES (and interactions with the player)
 
-//#region ENEMY MOVEMENT
+	// I will condense these 4 into 2 or 1 when I figure out a better way of making movement.
+	function chickenMovement(){
+		if (dead == false && pause == false) {if(ChickenDirection == "right") {Chicken.x += 1.8} if(ChickenDirection == "left") {Chicken.x -= 1.8} } };
+	function chickenRandomChange(){
+		if (dead == false && pause == false) {ChickenDirection = Math.random() < 0.5 ? "right" : "left"} };
 
-let ChickenDirection = "right";
-let WallobDirection = "right";
+	function wallobMovement(){
+		if(dead == false && pause == false) {if(WallobDirection == "right") {Wallob.x += 2.8} if(WallobDirection == "left") {Wallob.x -= 2.8} } };
+	function wallobRandomChange(){
+		if (dead == false && pause == false) {WallobDirection = Math.random() < 0.5 ? "right" : "left"} };
 
-var randTimer = (Math.random() * 100)
+	function collsionSoundLog(direction) {
+		const now = Date.now();
+		if (now - lastCollision >= CollisionCooldown) {console.log("colliding with enemy", direction), lastCollision = now;
+			if (hurt == true) {health -= 1, hurt == false};
+			if (health > 0) {var RandomCollisionSound = [Math.floor(Math.random() * 2)];
+				var ChosenCollisionSound = new Audio (CollisionSounds[RandomCollisionSound]); ChosenCollisionSound.play(); }
+			else {DeathSound.play(); } } };
 
-function chickenMovement(){
-	if(dead == false && pause == false){ if(ChickenDirection == "right"){Chicken.x += 1.8} if(ChickenDirection == "left"){Chicken.x -= 1.8}}};
-function chickenRandomChange(){
-	if (dead == false && pause == false){ChickenDirection = Math.random() < 0.5 ? "right" : "left"}};
+	function collisionDetecting(Player, Wallob) {
+		if (Player.x >= Wallob.x && Player.x <= Wallob.x + 48 && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your left")};
+		if (Player.x >= Wallob.x - 48 && Player.x <= Wallob.x && Player.y - 2 > Wallob.y - 2 && health > 0) { hurt = true, collsionSoundLog("to your right")};
+		if (Player.y >= Wallob.y - 52 && Player.x <= Wallob.x + 32 && Player.x >= Wallob.x - 32 && Player.y <= Wallob.y - 14) { hurt = true, collsionSoundLog("below"), Player.y = Wallob.y - 52, Player.velocityY = 0, jump(-4); };
+		if (Player.y > 700) {health = 0}; };
 
-function wallobMovement(){
-	if(dead == false && pause == false){ if(WallobDirection == "right"){Wallob.x += 2.8} if(WallobDirection == "left"){Wallob.x -= 2.8}}};
-function wallobRandomChange(){
-	if (dead == false && pause == false){WallobDirection = Math.random() < 0.5 ? "right" : "left"}};
+// UI AND CONTROLS
+	
+	function drawHealth() {
+		for (let heart = 0; heart < healthBar.length; heart++)
+			if (healthBar[heart] === 1) { context.drawImage(heartfullImage, [heart] * 48 + 16, 16, 32, 32); }
+			else { if (healthBar[heart] === 0) { context.drawImage(heartemptyImage, [heart] * 48 + 16, 16, 32, 32); } } };
 
-//#endregion ENEMY MOVEMENT
+	function coordTrack(Player) {coordstext.textContent = `GX: ${Math.round(groundMovement-128)}, PY: ${Math.round(Player.y)}` };
 
-//#region MUSIC START FUNCTION (BUGGED)
+	function musicStart() {
+		const now = Date.now();
+		let lastMusic = 0;
+		let musicCooldown = 1000;
+		if (now - lastMusic >= musicCooldown) {MusicChilderness.play(); }; };
 
-function musicStart() {
-	const now = Date.now();
-	let lastMusic = 0;
-	let musicCooldown = 1000;
-	if (now - lastMusic >= musicCooldown) {MusicChilderness.play();};};
+	window.addEventListener('keydown', function (e) {
+		keys[e.key] = true; const runDirection = ["a", "d"];
+		if (runDirection.includes(e.key) || e.ctrlKey) {e.preventDefault();} } );
+		//doesnt stop ctrl+W but does other combinations
+	window.addEventListener('keyup', function (e) {keys[e.key] = false;} );
 
-//#endregion
+//#endregion FUNCTIONS (GENERAL, PLAYER, ENEMY, UI AND CONTROLS)
 
-//#endregion🟥 MAIN VARIABLE AND CONSTANTS END
+//#endregion🟥 MAIN VARIABLES, CONSTANTS AND FUNCTIONS
 
 //🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰
 
@@ -329,7 +253,7 @@ function musicStart() {
 //#region DRAW GROUND & MUSIC FUNCTION CALLED
 
 		drawGround();
-		coordtrack(Player);
+		coordTrack(Player);
 
 //#endregion
 
@@ -405,28 +329,6 @@ function musicStart() {
 		else if (dead == true) { pauseScreen.textContent = "reload";}
 
 		if (!pause) { pauseUpdates(); };
-		function pauseUpdates() {
-
-//#endregion
-
-//#region KEY CHECKS, SPEED, VELOCITY, GROUND AND PARACHUTE REGULATIONS
-
-
-
-	//#endregion
-
-//#region CALLING COLLISION AND BOUNDING FUNCTIONS
-
-			// for (let i = 0; i < length(Enemy); i++) ???
-				randTimer -= 1;
-				if (randTimer > 0) {randTimer -= 1}
-				else if (randTimer <= 0) {randTimer = Math.random() * 100, chickenRandomChange(), wallobRandomChange()};
-
-			if (dead == false) {collisionDetecting(Player, Wallob);
-			chickenMovement();
-			wallobMovement();
-			boundingBox(Player);}
-		};
 
 	//#endregion
 
@@ -456,6 +358,6 @@ function musicStart() {
 
 // THINGS TO WORK ON: Screen scrolling (MOVING SCREEN AROUND THE PLAYER RATHER THAN MOVING THE WHOLE HTML DOC), enemy movement, animation, temperature bar, fixed object-based collision for ground features
 // LESS IMPORTANT: Sound design, texturing, niche/minor features
-// CURRENT THING: SCREEN SCROLL MECHANIC - Ground objects and collision fixing and adding classes.
+// CURRENT THING: solid ground, onground fix to blocks themselves not a level of gorund
 
 //#endregion🟩 NOTES END
