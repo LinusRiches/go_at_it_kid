@@ -7,39 +7,39 @@
 }
 
 #brickborder {
+  z-index: 2;
   position: absolute;
   image-rendering: pixelated;
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
-  background-image: url('assets/textures/backgrounds/bricks.png');
-  z-index: 2;
+  
 }
 
 #gamespace {
+  z-index: 1;
   position: absolute;
   image-rendering: pixelated;
   transform: translate(-50.05%, -50%);
   top: 50%;
   left: 50%;
   background-image: url('assets/textures/backgrounds/background.png');
-  background-size: 1300px, 700px;
-  z-index: 1;
-  background-repeat:no-repeat;
+  background-size: 1800px, 1200px;
+  background-repeat:repeat-x;
 }
 
 #titletop {
+  z-index: 3;
   position: absolute;
   image-rendering: pixelated;
-  transform: translate(-50%, -500%);
-  top: 50%;
+  transform: translate(-50%, -625%);
+  top: 50.1%;
   left: 50%;
-  z-index: 3;
-  width: 480px;
+  width: 640px;
 }
 
 #issues {
-  z-index: 4;
+  z-index: 3;
   font-size: xx-large;
   bottom: 10%;
   left: 50%;
@@ -47,52 +47,52 @@
 }
 
 #musicbtn {
-  z-index: 4;
+  z-index: 3;
   position: absolute;
-  top: 48px;
-  left: 1297.5px;
+  top: 120px;
+  left: 2209px;
 }
 
 #soundbtn {
-  z-index: 4;
+  z-index: 3;
   position: absolute;
-  top: 48px;
-  left: 1233.5px;
+  top: 120px;
+  left: 2145px;
 }
 
 #teststats {
-  z-index: 4;
+  z-index: 3;
   position: absolute;
-  top: 20%;
-  right: 43%;
+  top: 10%;
+  right: 47%;
   z-index: 3;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   color: rgb(252, 252, 252);
-  font-size: x-large;
+  font-size: xx-large;
 }
 
 #deathscreen {
+  z-index: 3;
   display: block;
   position: absolute;
   transform: translate(-50%, -130%);
-  top: 50%;
+  top: 70%;
   left: 50%;
   font-size: 100px;
   color: rgb(207, 0, 35);
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  z-index: 3;
 }
 
 #pausescreen {
+  z-index: 3;
   display: block;
   position: absolute;
   transform: translate(-50%, -50%);
-  top: 50%;
+  top: 55%;
   left: 50%;
   font-size: 125px;
   color: rgb(251, 251, 251);
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  z-index: 4;
 }
 
 p{
